@@ -17,6 +17,11 @@ using System.Web.Script.Serialization;
 using System.Globalization;
 using System.Data.SqlClient;
 using System.Configuration;
+using Newtonsoft.Json;
+using Mendeley.ModelResponse;
+using System.Net.Http;
+using Mono.Web;
+using Newtonsoft.Json.Linq;
 
 namespace Mendeley
 {
@@ -24,371 +29,29 @@ namespace Mendeley
     {
         OpenFileDialog ofd = new OpenFileDialog();
         Functions func = new Functions();
-        Types types = new Types();
+        //Types types = new Types();
         ArrayList al;
         JournalArticle[] journalArticle;
-        User_library[] user_library;
+
+        public bool haveInternet { get; set; }
+
+        private int dataGridRowIndex = 0;
+
+        private static int FileAttachedInd = 1;
+        private static int AuthorsInd = 2;
+        private static int TitleInd = 3;
+        private static int YearInd = 4;
+        private static int JournalInd = 5;
+        private static int CreatedAtInd = 6;
+
+        SortedDictionary<int, TreeNode> folderTreeIds;
+        //SortedDictionary<int ListViewItem> articleListId;
+
+        List<JournalArticle> articlesList;
+        List<Folder> foldersList;
+
+        //User_library[] user_library;
         String fileDestPath;
-
-        private string uid = "1";
-
-        public string passUID {
-            get { return uid; }
-            set { uid = value; }
-        }
-
-        public Library()
-        {
-            InitializeComponent();
-        }
-
-        public void sendPostGetUserLibrary() {
-            string URL = "http://a0021435.xsph.ru/Mendeley/visual/getUserLibrary.php";
-            WebClient webClient = new WebClient();
-            webClient.Proxy.Credentials = CredentialCache.DefaultCredentials;
-
-            NameValueCollection formData = new NameValueCollection();
-            formData["uid"] = "1";
-
-            byte[] responseBytes = webClient.UploadValues(URL, "POST", formData);
-            string responsefromserver = Encoding.UTF8.GetString(responseBytes);
-            //MessageBox.Show("Remote user_library "+responsefromserver);
-            webClient.Dispose();
-
-            //MessageBox.Show("Remote user_library response " + responsefromserver);
-
-            JavaScriptSerializer js = new JavaScriptSerializer();
-            user_library = js.Deserialize<User_library[]>(responsefromserver);
-            //MessageBox.Show("Remote user_library mid "+user_library[0].mid);
-        }
-
-
-
-
-        public void CreateFolder() {
-            if (System.IO.File.Exists(uid))
-            {
-
-                //MessageBox.Show("File exists");
-            }
-            else {
-                System.IO.Directory.CreateDirectory(uid);
-                //MessageBox.Show("File not exists");
-            }
-
-        }
-
-
-
-        public void tryFTP() {
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://testingweb.ru/public_html/Mendeley/guice.pdf");
-            request.Method = WebRequestMethods.Ftp.UploadFile;
-
-            request.Credentials = new NetworkCredential("filezilla@a0021435.xsph.ru", "351942025500ghj");
-
-            byte[] fileContents = File.ReadAllBytes("guice.pdf");
-
-
-            request.ContentLength = fileContents.Length;
-
-            Stream requestStream = request.GetRequestStream();
-            requestStream.Write(fileContents, 0, fileContents.Length);
-            requestStream.Close();
-
-            FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-
-            Console.WriteLine("Upload File Complete, status {0}", response.StatusDescription);
-
-            response.Close();
-        }
-
-
-
-
-
-
-        private void listView1_MouseClick(object sender, MouseEventArgs e)
-        {
-            FillDetails();
-        }
-
-        private void FillDetails() {
-            if (listView1.SelectedItems[0].SubItems[1].Text.ToString().Equals(""))
-            {
-                btnFiles.Tag = null;
-                btnFiles.Text = "Add file";
-            }
-            else {
-                btnFiles.Text = "Open file";
-                btnFiles.Tag = listView1.SelectedItems[0].SubItems[1].Text.ToString();
-            }
-            foreach (MendeleyLocalDataSet.JournalArticlesRow article in mendeleyLocalDataSet.JournalArticles.Rows)
-            {
-                if (article.title.Equals(listView1.SelectedItems[0].SubItems[3].Text.ToString())) {
-                    
-                    txtJournal.Text = article.journal.ToString();
-                    txtYear.Text = article.year.ToString();
-                    txtAuthors.Text = article.authors;
-                    materialid.Text = article.Id.ToString();
-                    comboBoxTypes.SelectedIndex = 0;
-                    materialtype.Text = "JournalArticle";
-                    txtVolume.Text = article.volume.ToString();
-                    txtIssue.Text = article.issue.ToString();
-                    txtPages.Text =  article.pages.ToString();
-
-                    if (!article.IstitleNull()) {
-                        tvName.Text = article.title;
-                    }
-
-                    if (!article.Is_abstractNull())
-                    {
-                        txtAbstract.Text = article._abstract;
-                    }   
-                    
-                    if (!article.IsArXivIDNull()) {
-                    txtArXivID.Text = article.ArXivID;
-                    }
-                    if (!article.IsDOINull()) {
-                        txtDOI.Text = article.DOI;
-                    }
-                    if (!article.IsPMIDNull()) {
-                        txtPMID.Text = article.PMID;
-                    }
-                    break;
-                }
-            }
-
-        }
-
-        
-
-        private void btnTest_Click(object sender, EventArgs e)
-        {
-            tabControl1.TabPages.Remove(tabPage1);
-            //tabControl1.TabPages.Add(tabPage1);
-            TabPage tabPageInsert = types.JournalArticle();
-            tabControl1.TabPages.Insert(0, tabPageInsert);
-            tabControl1.SelectedTab = tabPageInsert;
-            //MessageBox.Show(tabControl1.Focused.ToString());
-
-
-            NameValueCollection nvp = new NameValueCollection();
-            KeyValuePair<String, String> kvp = new KeyValuePair<string, string>();
-
-            /*kvp["id"] = "one";
-            kvp.
-
-            func.CompareDataToJson(nvp);*/
-
-            /*String[] jsonArr = {"01", "02"};
-            var jsonSerializer = new JavaScriptSerializer();
-            string json = jsonSerializer.Serialize(jsonArr);
-            MessageBox.Show(json);*/
-        }
-
-        private void btnSync_Click(object sender, EventArgs e)
-        {
-            Synchronize();
-        }
-
-        DataTable GetMyLib()
-        {
-            DataTable dt = new DataTable();
-
-            MySqlConnectionStringBuilder mysqlSB = new MySqlConnectionStringBuilder();
-
-            List<int> mid = new List<int>();
-            List<String> type = new List<String>();
-            List<int> favourite = new List<int>();
-
-            mysqlSB.Server = "141.8.195.41";
-            mysqlSB.Database = "a0021435_mendeley";
-            mysqlSB.UserID = "a0021435_user";
-            mysqlSB.Password = "351942025500ghj";
-
-            //MessageBox.Show(uid);
-
-            //uid = "\'" + uid + "\'";
-            uid = "1";
-
-            string queryString = @"SELECT type,mid,favorite FROM user_library WHERE uid=" + uid;
-
-            using (MySqlConnection con = new MySqlConnection())
-            {
-                con.ConnectionString = mysqlSB.ConnectionString;
-                MySqlCommand com = new MySqlCommand(queryString, con);
-
-                try
-                {
-                    con.Open();
-
-                    using (MySqlDataReader dr = com.ExecuteReader())
-                    {
-
-
-                        al = new ArrayList();
-                        
-                        while (dr.Read())
-                        {
-
-                            object[] values = new object[dr.FieldCount];
-                            dr.GetValues(values);
-                            al.Add(values);
-                        }
-                        //MessageBox.Show(al.Count.ToString());
-                        dr.Close();
-                        con.Close();
-
-                        foreach (object[] row in al)
-                        {
-                            foreach (object column in row)
-                            {
-
-                                //MessageBox.Show(column.ToString());
-                            }
-                        }
-                    }
-
-                    con.Close();
-                }
-
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            }
-            return dt;
-        }
-
-        public int idCounter = 0;
-
-        public void Synchronize()
-        {
-
-            sendPostGetUserLibrary();
-
-            //MessageBox.Show(GetMyLib().ToString());
-            sendPostGetJournalArticles();
-            //MessageBox.Show("Remote library rows count "+journalArticle.Length);
-            
-            //MessageBox.Show("Local library rows count "+ mendeleyLocalDataSet.user_library.Count);
-            DataRow[] rowsUserLibrary =  mendeleyLocalDataSet.user_library.Select();
-
-            //MessageBox.Show("Local Rows count "+ rows.Length);
-            //MessageBox.Show("Local Row 2 " + rows[0].ItemArray[2]);
-
-            MessageBox.Show("Sync button clicked");
-
-            if (user_library.Length == mendeleyLocalDataSet.user_library.Count)
-            {
-
-                MessageBox.Show("Local and Remote data nums are equal");//Количество записей одинаково
-
-                //TEST
-                MessageBox.Show(user_library[1].ToString());
-                bool findIt = false;
-
-                
-
-                //Count of data are equal
-                //Берем mid с обоих баз, сравниваем edit_date
-                for (int i = 0; i < user_library.Length; i++)
-                {
-                    for (int k = 0; k < rowsUserLibrary.Length; k++)
-                    {
-                        MessageBox.Show("i = "+i+", k = "+k);
-                        /*MessageBox.Show("Remote user_library uid "+user_library[i].uid+
-                            ", local user_library uid "+rowsUserLibrary[k].ItemArray[0]);*/
-                        if (user_library[i].mid == (int)rowsUserLibrary[k].ItemArray[2])
-                        {
-                            //Если количество статей и mid одинаковы, сравниваем по edit_date
-                            findIt = true;
-                            //MessageBox.Show("Find it");
-                            //idCounter++;
-                            CompareArticles((int)rowsUserLibrary[k].ItemArray[2], user_library[i].mid, "JournalArticle");
-                            break;
-                        }
-                    }
-                    if (findIt)
-                    {
-                        //MessageBox.Show("Соответствие найдено");
-                        findIt = false;
-                        //idCounter++;
-                    }
-                    else {
-                        MessageBox.Show("Соответствие не найдено");
-                        //Если количество статей одинаково, но mid отличаются то
-                    }
-                }
-                MessageBox.Show("idCounter " +idCounter);
-            }
-            else {
-                MessageBox.Show("Local and Remote datas are not same length");
-            }
-        }
-
-        public void CompareArticles(int localMid, int remoteMid, string type) {
-            MessageBox.Show("Remote articles count "+journalArticle.Length);
-
-            for (int i =0;i<journalArticle.Length;i++) {
-                MessageBox.Show("Remote article id "+journalArticle[i].id);
-                if (journalArticle[i].id == remoteMid)
-                {
-                    //MessageBox.Show("Remote mid title "+journalArticle[i].title);
-
-                    DataRow[] rowsJournalArticle = mendeleyLocalDataSet.JournalArticles.Select();
-
-                    MessageBox.Show("Remote update_date " + journalArticle[i].update_date);
-
-                    /*string testDateTime = "0001-01-01 00:00:00";
-                    DateTime testDT = DateTime.Parse(testDateTime);
-                    MessageBox.Show(testDT.ToString());*/
-
-
-                    //MessageBox.Show("Remote update_date" + DateTime.Parse(journalArticle[i].update_date));
-
-                    if (journalArticle[i].update_date == "0000-00-00 00:00:00")
-                    {
-                        journalArticle[i].update_date = "0001-01-01 00:00:00";
-                    }
-
-                    //string remoteUpdateDateStr = DateTime.ParseExact(journalArticle[i].update_date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture).ToString("dd/MM/yyyy");
-
-                    MessageBox.Show("Remote update_date" + DateTime.Parse(journalArticle[i].update_date));
-
-                    if (DateTime.Parse(journalArticle[i].update_date) > DateTime.Parse(rowsJournalArticle[0].ItemArray[14].ToString()))
-                    {
-                        MessageBox.Show("Remote database is newer");
-                        MessageBox.Show("Remote mid update_date " + journalArticle[i].update_date + ", local mid update_date " + rowsJournalArticle[0].ItemArray[14]);
-                        //Change local row with data from newer remote (journalArticle)
-                    }
-                    else
-                    {
-                        MessageBox.Show("Local database is newer");
-                        Sync sync = new Sync();
-                        sync.UpdateRemoteJournalArticle(rowsJournalArticle);
-                        //Transfer newer local data to website and UPDATE tableRow
-                    }
-
-                    return;
-                }
-                //if we add multiple number of articles in both database
-                
-            }
-
-            
-        }
-
-        private void journalArticlesBindingNavigatorSaveItem_Click(object sender, EventArgs e)
-        {
-            //TODO: Uncomment on Release
-            //uid = passUID;
-            this.Validate();
-            this.journalArticlesBindingSource.EndEdit();
-            this.user_libraryBindingSource.EndEdit();
-            this.tableAdapterManager.UpdateAll(this.mendeleyLocalDataSet);
-
-        }
 
         private void Library_Load(object sender, EventArgs e)
         {
@@ -398,351 +61,770 @@ namespace Mendeley
             //MessageBox.Show("DEBUG");
             Properties.Settings.Default.Reset();
 #endif
-            if (Properties.Settings.Default.FirstRun)
-            {
-                MessageBox.Show("FirstTimeRunning ");
+
+#if !DEBUG
+            //MessageBox.Show("Release");
+#endif
+
+            if (String.IsNullOrEmpty(Properties.Settings.Default.Workspace)) {
                 FolderBrowserDialog fold = new FolderBrowserDialog();
                 fold.Description = "Выберите папку для сохранения статей";
                 if (fold.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
+                    Properties.Settings.Default.Workspace = fold.SelectedPath;
+                    Properties.Settings.Default.Save();
+                }
+            }
 
-                    //MessageBox.Show(fold.SelectedPath);
-                    //TODO: uncomment on release
-                    Configuration configManager =ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                    KeyValueConfigurationCollection confCollection = configManager.AppSettings.Settings;
-                    KeyValueConfigurationElement keyValElem = new KeyValueConfigurationElement("Workspace",fold.SelectedPath);
 
-                    confCollection.Add(keyValElem);
+                /*if (!ConfigurationManager.AppSettings.AllKeys.Contains("Workspace")) {
+                MessageBox.Show("Checked good");
+                Configuration currentConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                MessageBox.Show("Connected good");
 
-                    configManager.Save(ConfigurationSaveMode.Modified);
-                    ConfigurationManager.RefreshSection(configManager.AppSettings.SectionInformation.Name);
+                FolderBrowserDialog fold = new FolderBrowserDialog();
+                fold.Description = "Выберите папку для сохранения статей";
+                if (fold.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    currentConfig.AppSettings.Settings.Add("Workspace", fold.SelectedPath);
+
+                    MessageBox.Show("Added good");
+
+                    //Здесь ошибка
+                    currentConfig.Save(ConfigurationSaveMode.Modified);
+
+                    MessageBox.Show("Saved good");
+
+                    ConfigurationManager.RefreshSection("appSettings");
+
+                    MessageBox.Show("Refreshed good");
                 }
 
-                Properties.Settings.Default.FirstRun = false;
-                Properties.Settings.Default.Save();
-#if DEBUG
-                //MessageBox.Show("DEBUG");
-                Properties.Settings.Default.Reset();
-#endif
-            }
-            
-            this.user_libraryTableAdapter.Fill(this.mendeleyLocalDataSet.user_library);
-            
-            this.journalArticlesTableAdapter.Fill(this.mendeleyLocalDataSet.JournalArticles);
-            FillListViewFromLocalDataSet();
+                
+            }*/
+
+            func.recreateAllTables();
+
+            foldersList = func.getAllFolders();
+            articlesList = func.getRootFolderArticles();
+
+            getFolders();
+            getArticles();
+
+            //func.recreateAllTables();
+
 
         }
 
-        public void RefreshData() {
-            
-            this.user_libraryTableAdapter.Fill(this.mendeleyLocalDataSet.user_library);
-            
-            this.journalArticlesTableAdapter.Fill(this.mendeleyLocalDataSet.JournalArticles);
-            FillListViewFromLocalDataSet();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            contextMenuStrip1.Show(button2, 0, button2.Height);
-        }
-
-        private void btnSaveChange_Click(object sender, EventArgs e)
-        {
-            foreach (DataRow article in mendeleyLocalDataSet.JournalArticles) {
-                MessageBox.Show(article.ItemArray[0].ToString());
-            }
-            /*if (mendeleyLocalDataSet.JournalArticles.Rows.Count != 0)
+        private void getFolders() {
+            //MessageBox.Show(Convert.ToString(foldersList.Count));
+            if (foldersList.Count == 0 && haveInternet)
             {
-                int maxSongId = mendeleyLocalDataSet.Tables["JournalArticles"].AsEnumerable().Max(r => r.Field<int>("id"));
-                MessageBox.Show(maxSongId.ToString());
+                //MessageBox.Show("First time folders");
+                getFirstTimeFolders();
+                
             }
             else {
-                MessageBox.Show("First record");
-            }*/
-            MessageBox.Show(mendeleyLocalDataSet.JournalArticles[0].title);
+                //MessageBox.Show("Folders exists");
+                loadFolder();
+            }
+            tvFolderTitle.Text = foldersList[0].getTitle();
+        }
+
+        private void loadFolder() {
+
+            folderTreeIds = new SortedDictionary<int, TreeNode>();
+
+            foreach (Folder folder in foldersList)
+            {
+
+                /*Console.WriteLine("Folder id: "+folder.getLocal_id()
+                    +", name: "+folder.getTitle()+", parent_id: "+folder.getParent_id());*/
+
+                if (folder.getParent_id() == 0)
+                {
+                    TreeNode rootNode = new TreeNode(folder.getTitle());
+                    folderTreeIds.Add(folder.getLocal_id(),rootNode);
+                    rootNode.Tag = folder.getLocal_id();
+                    treeView1.Nodes.Add(rootNode);
+                }
+                else {
+                    TreeNode child = new TreeNode(folder.getTitle());
+                    child.Tag = folder.getLocal_id();
+
+                    TreeNode parent;
+                    folderTreeIds.TryGetValue(folder.getParent_id(), out parent);
+                    
+                    parent.Nodes.Add(child);
+                    folderTreeIds.Add(folder.getLocal_id(),child);
+                }
+
+            }
+
+        }
+
+        private void getArticles() {
+            //TODO: haveInternet
+            if (articlesList.Count == 0 && haveInternet)
+            {
+                getFirstTimeArticles();
+            }
+            else {
+                initDataGrid();
+            }
+        }
+
+        private void initDataGrid()
+        {
+
+            //articleTable.Columns.Add("favortie", typeof(int));
+            dataGridView1.Rows.Clear();
+            dataGridView1.Columns.Clear();
             
-        }
 
-        private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
+            Image emptyStar = imageList1.Images[0];
+            Image fillStar = imageList1.Images[1];
+            Image document = imageList1.Images[2];
 
-        }
+            //dataGridView1.Rows.Add("1",emptyStar);
+
+            DataGridViewImageColumn dgvFavoriteCol = new DataGridViewImageColumn();
+            dgvFavoriteCol.DefaultCellStyle.NullValue = null;
+
+            DataGridViewImageColumn dgvFileAttachedCol = new DataGridViewImageColumn();
+            dgvFileAttachedCol.DefaultCellStyle.NullValue = null;
+
+            DataGridViewTextBoxColumn dgvAuthorsCol = new DataGridViewTextBoxColumn();
+            dgvAuthorsCol.HeaderText = "Authors";
+
+            DataGridViewTextBoxColumn dgvTitleCol = new DataGridViewTextBoxColumn();
+            dgvTitleCol.HeaderText = "Title";
+
+            DataGridViewTextBoxColumn dgvYearCol = new DataGridViewTextBoxColumn();
+            dgvYearCol.HeaderText = "Year";
+
+            DataGridViewTextBoxColumn dgvPublishedInCol = new DataGridViewTextBoxColumn();
+            dgvPublishedInCol.HeaderText = "Published In";
+
+            DataGridViewTextBoxColumn dgvCreatedAtCol = new DataGridViewTextBoxColumn();
+            dgvCreatedAtCol.HeaderText = "Created At";
+
+            dataGridView1.Columns.Add(dgvFavoriteCol);
+            dataGridView1.Columns.Add(dgvFileAttachedCol);
+            dataGridView1.Columns.Add(dgvAuthorsCol);
+            dataGridView1.Columns.Add(dgvTitleCol);
+            dataGridView1.Columns.Add(dgvYearCol);
+            dataGridView1.Columns.Add(dgvPublishedInCol);
+            dataGridView1.Columns.Add(dgvCreatedAtCol);
+
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            //dataGridView1.RowTemplate.Height = 120;
+
+            dataGridView1.AllowUserToAddRows = false;
 
 
 
-        //Testing REMOVE LATER
-        public void sendPostGetJournalArticles()
-        {
-            string URL = "http://a0021435.xsph.ru/Mendeley/visual/getLibrary.php";
-            WebClient webClient = new WebClient();
-            webClient.Proxy.Credentials = CredentialCache.DefaultCredentials;
-
-            NameValueCollection formData = new NameValueCollection();
-            formData["uid"] = "1";
-
-            byte[] responseBytes = webClient.UploadValues(URL, "POST", formData);
-            string responsefromserver = Encoding.UTF8.GetString(responseBytes);
-            //MessageBox.Show("getLibrary response "+responsefromserver);
-            webClient.Dispose();
-
-            JavaScriptSerializer js = new JavaScriptSerializer();
-            journalArticle = js.Deserialize<JournalArticle[]>(responsefromserver);
-            //MessageBox.Show(journalArticle[0].title);
-
-            listView1.Items.Clear();
-            //MessageBox.Show(journalArticle.Length.ToString());
-            for (int i = 0; i < journalArticle.Length; i++)
+            for (int i = 0; i < articlesList.Count; i++)
             {
 
-                ListViewItem item = new ListViewItem(journalArticle[i].id.ToString());
-                item.SubItems.Add(journalArticle[i].filepath);
-                item.SubItems.Add(journalArticle[i].authors);
-                item.SubItems.Add(journalArticle[i].title);
-                item.SubItems.Add(journalArticle[i].year.ToString());
-                item.SubItems.Add(journalArticle[i].journal);
-                item.SubItems.Add(journalArticle[i].add_date.ToString());
+                int favorite = articlesList[i].getFavorite();
 
-                listView1.Items.Add(item);
-            }
+                Image star;
+                Image doc = null;
 
+                if (favorite == 0)
+                {
+                    star = emptyStar;   
+                }
+                else {
+                    star = fillStar;
+                }
 
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            sendPostGetJournalArticles();
-            foreach (DataRow row in mendeleyLocalDataSet.JournalArticles.Rows) {
-                row.Delete();
-            }
-            journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
-
-            foreach (DataRow row in mendeleyLocalDataSet.user_library.Rows) {
-                row.Delete();
-            }
-            user_libraryTableAdapter.Update(mendeleyLocalDataSet.user_library);
-
-            sendPostGetUserLibrary();
-            foreach (JournalArticle article in journalArticle)
-            {
-                //string remoteUpdateDateStr = DateTime.ParseExact(journalArticle[i].update_date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture).ToString("dd/MM/yyyy");
-                //MessageBox.Show(article.title);
-                MendeleyLocalDataSet.JournalArticlesRow newJournalArticleRow;
-                newJournalArticleRow = mendeleyLocalDataSet.JournalArticles.NewJournalArticlesRow();
-
-                newJournalArticleRow.Id = article.id;
-                newJournalArticleRow.title = article.title;
-                newJournalArticleRow.authors = article.authors;
-                newJournalArticleRow._abstract = article.abstractText;
-                newJournalArticleRow.year = article.year;
-                newJournalArticleRow.journal = article.journal;
-                newJournalArticleRow.filepath = article.filepath;
-                newJournalArticleRow.volume = article.volume;
-                newJournalArticleRow.pages = article.pages;
-                newJournalArticleRow.issue = article.issue;
-                newJournalArticleRow.ArXivID = article.ArXivID;
-                newJournalArticleRow.DOI = article.DOI;
-                newJournalArticleRow.PMID = article.PMID;
-                newJournalArticleRow.add_date = DateTime.Parse(article.add_date);
+                string fileAttached = articlesList[i].getFilepath();
+                if (!string.IsNullOrWhiteSpace(fileAttached)) {
+                    doc = document;
+                }
 
 
-
+                string authors = articlesList[i].getAuthors();
+                string title = articlesList[i].getTitle();
+                int year = articlesList[i].getYear();
                 
-                DateTime ukDateFormat;
-                string ukFormat = "dd.MM.yyyy H:mm:ss";
-                //update_date
-                DateTime.TryParseExact(article.update_date, ukFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out ukDateFormat);
-                DateTime update_date = ukDateFormat;
-                //delete_date
-                DateTime.TryParseExact(article.delete_date, ukFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out ukDateFormat);
-                DateTime delete_date = ukDateFormat;
+                string journal = articlesList[i].getJournal();
+                string created_at = articlesList[i].getCreated_at();
 
-                newJournalArticleRow.update_date = update_date;
-                newJournalArticleRow.delete_date = delete_date;
+                int rowIndex = dataGridView1.Rows.Add();
 
-                mendeleyLocalDataSet.JournalArticles.Rows.Add(newJournalArticleRow);
+                DataGridViewRow newRow = dataGridView1.Rows[rowIndex];
+                newRow.Cells[0].Value = star;
+                newRow.Cells[1].Value = doc;
+                newRow.Cells[2].Value = authors;
+                newRow.Cells[3].Value = title;
 
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
+                if (year != -1)
+                {
+                    newRow.Cells[4].Value = year;
+                }
+                
 
-            }
-            foreach (User_library libItem in user_library)
-            {
-                //MessageBox.Show(libItem.mid.ToString());
+                newRow.Cells[5].Value = journal;
+                newRow.Cells[6].Value = created_at;
 
-                MendeleyLocalDataSet.user_libraryRow newuser_libraryRow;
-                newuser_libraryRow = mendeleyLocalDataSet.user_library.Newuser_libraryRow();
+                newRow.Tag = i;
 
-                newuser_libraryRow.id = libItem.id;
-                //MessageBox.Show(libItem.id.ToString());
-                newuser_libraryRow.mid = libItem.mid;
-                newuser_libraryRow.uid = libItem.uid;
-                newuser_libraryRow.type = libItem.type;
-                newuser_libraryRow.favorite = libItem.favorite;
-
-                mendeleyLocalDataSet.user_library.Rows.Add(newuser_libraryRow);
-
-                user_libraryTableAdapter.Update(mendeleyLocalDataSet.user_library);
+                //articleTable.Rows.Add(star,fileAttached,authors,title,year,journal,created_at);
+                //articleTable.Rows.Add(authors, title, year, journal, created_at);
             }
 
+            //dataGridView1.DataSource = articleTable;
 
         }
-
-        private void txtJournal_TextChanged(object sender, EventArgs e)
+        
+        private void dataGridView1_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
         {
-            if (txtJournal.Focused) {
-                MessageBox.Show("txtJournal in focus");
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text));
-                journalArticleRow.journal = txtJournal.Text.ToString();
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
-                //MessageBox.Show(journalArticleRow.journal);
-                MessageBox.Show("SelectedIndex " + listView1.SelectedIndices[0]);
-                listView1.SelectedItems[0].SubItems[5].Text = journalArticleRow.journal;
+            if (e.ColumnIndex == 0 && e.RowIndex != -1) {
+
+                //MessageBox.Show("Row mouse enter index: " + e.RowIndex + ", column index: " + e.ColumnIndex);
+
+                Image emptyStar = imageList1.Images[0];
+                Image fillStar = imageList1.Images[1];
+
+                DataGridViewRow hoverRow = dataGridView1.Rows[e.RowIndex];
+                int listIndex = Convert.ToInt32(hoverRow.Tag);
+
+                if (articlesList[listIndex].getFavorite() == 0)
+                {
+                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = fillStar;
+                }
+                else {
+                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = emptyStar;
+                }
             }
         }
-
-        private void txtYear_TextChanged(object sender, EventArgs e)
+        
+        private void dataGridView1_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
         {
-            if (txtYear.Focused)
+            if (e.ColumnIndex == 0 && e.RowIndex != -1)
             {
-                MessageBox.Show("txtYear in focus");
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text));
-                journalArticleRow.year = int.Parse(txtYear.Text.ToString());
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
-                listView1.SelectedItems[0].SubItems[4].Text = journalArticleRow.year.ToString();
+                //MessageBox.Show("Row mouse leave index: "+e.RowIndex+", column index: "+e.ColumnIndex);
+
+                Image emptyStar = imageList1.Images[0];
+                Image fillStar = imageList1.Images[1];
+
+                DataGridViewRow hoverRow = dataGridView1.Rows[e.RowIndex];
+                int listIndex = Convert.ToInt32(hoverRow.Tag);
+
+                if (articlesList[listIndex].getFavorite() == 0)
+                {
+                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = emptyStar;
+                }
+                else {
+                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = fillStar;
+                }
             }
         }
 
-        private void txtVolume_TextChanged(object sender, EventArgs e)
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (txtVolume.Focused)
+            if (e.ColumnIndex == 0 && e.RowIndex != -1)
             {
-                MessageBox.Show("txtVolume in focus");
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text));
-                journalArticleRow.volume = int.Parse(txtVolume.Text.ToString());
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
+                //MessageBox.Show("Row mouse leave index: "+e.RowIndex+", column index: "+e.ColumnIndex);
+
+                Image emptyStar = imageList1.Images[0];
+                Image fillStar = imageList1.Images[1];
+
+                DataGridViewRow hoverRow = dataGridView1.Rows[e.RowIndex];
+                int listIndex = Convert.ToInt32(hoverRow.Tag);
+
+                if (articlesList[listIndex].getFavorite() == 0)
+                {
+                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = fillStar;
+                    articlesList[listIndex].setFavorite(1);
+                    func.setFavorite(articlesList[listIndex].getLocal_id(), 1);
+                }
+                else {
+                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = emptyStar;
+                    articlesList[listIndex].setFavorite(0);
+                    func.setFavorite(articlesList[listIndex].getLocal_id(), 0);
+                }
             }
         }
 
-        private void txtIssue_TextChanged(object sender, EventArgs e)
+        private void dataGridView1_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            if (txtIssue.Focused)
+            if (e.ColumnIndex == 0 && e.RowIndex == -1)
             {
-                //MessageBox.Show("txtVolume in focus");
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text));
-                journalArticleRow.issue = int.Parse(txtIssue.Text.ToString());
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
+
+                e.PaintBackground(e.ClipBounds, false);
+
+                Point pt = e.CellBounds.Location;
+
+                int offset = (e.CellBounds.Width - imageList1.ImageSize.Width) / 2;
+                pt.X += offset;
+                pt.Y += 1;
+                imageList1.Draw(e.Graphics, pt, 0);
+                e.Handled = true;
+
+            }
+
+            if (e.ColumnIndex == 1 && e.RowIndex == -1)
+            {
+
+                e.PaintBackground(e.ClipBounds, false);
+
+                Point pt = e.CellBounds.Location;
+
+                int offset = (e.CellBounds.Width - imageList1.ImageSize.Width) / 2;
+                pt.X += offset;
+                pt.Y += 1;
+                imageList1.Draw(e.Graphics, pt, 2);
+                e.Handled = true;
+
             }
         }
 
-        private void txtPages_TextChanged(object sender, EventArgs e)
+        public Library()
         {
-            if (txtPages.Focused)
-            {
-                //MessageBox.Show("txtVolume in focus");
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text));
-                journalArticleRow.pages = int.Parse(txtPages.Text.ToString());
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
-            }
+            InitializeComponent();
+            PW = slidePanel.Width;
+            Hided = false;
         }
 
-        private void txtAbstract_TextChanged(object sender, EventArgs e)
+        private void getFirstTimeFolders()
         {
-            if (txtAbstract.Focused)
+            NameValueCollection formData = HttpUtility.ParseQueryString(String.Empty);
+            formData.Add("type","windows");
+            string postData = formData.ToString();
+
+            string foldersResponse = RESTful.PostRequest(EndPoints.URL_SYNC_FOLDERS,postData);
+
+            var folders = JsonConvert.DeserializeObject<List<FolderResponse>>(foldersResponse);
+
+            foreach (FolderResponse responseFolder in folders)
             {
-                //MessageBox.Show("txtVolume in focus");
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text));
-                journalArticleRow._abstract = txtAbstract.Text.ToString();
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
+                /*Console.WriteLine("Folder response: id: "+responseFolder.id+", name: "
+                    + responseFolder.name+", parent_id: "+responseFolder.parent_id);*/
+
+                Folder folder = new Folder(responseFolder.id,responseFolder.name,responseFolder.parent_id);
+                foldersList.Add(folder);
             }
+
+            func.recreateAllFolders(foldersList);
+            foldersList = func.getAllFolders();
+            loadFolder();
+
+
+            //Console.WriteLine("All folders: " + foldersResponse);
+
+
         }
 
-        private void txtArXivID_TextChanged(object sender, EventArgs e)
-        {
-            if (txtArXivID.Focused)
+        private void getFirstTimeArticles() {
+
+            NameValueCollection formData = HttpUtility.ParseQueryString(String.Empty);
+            formData.Add("type","windows");
+            string postData = formData.ToString();
+
+            string articlesResponse = RESTful.PostRequest(EndPoints.URL_SYNC_ARTICLES, postData);
+
+            var settings = new JsonSerializerSettings
             {
-                //MessageBox.Show("txtVolume in focus");
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text));
-                journalArticleRow.ArXivID = txtArXivID.Text.ToString();
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
-            }
-        }
+                NullValueHandling = NullValueHandling.Ignore,
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            };
 
-        private void txtDOI_TextChanged(object sender, EventArgs e)
-        {
-            if (txtDOI.Focused)
+            var articles = JsonConvert.DeserializeObject<List<JournalArticleResponse>>(articlesResponse,settings);
+
+            foreach (JournalArticleResponse responseArticle in articles)
             {
-                //MessageBox.Show("txtVolume in focus");
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text));
-                journalArticleRow.DOI = txtDOI.Text.ToString();
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
+
+                /*Console.WriteLine("Article id: "+responseArticle.id+", title: "+responseArticle.title
+                    +", pages: "+responseArticle.pages);*/
+
+                int volume = responseArticle.volume == 0 ? -1 : responseArticle.volume;
+                int issue = responseArticle.issue == 0 ? -1 : responseArticle.issue;
+                int year = responseArticle.year == 0 ? -1 : responseArticle.year;
+                int pages = responseArticle.pages == 0 ? -1 : responseArticle.pages;
+                int ArXivID = responseArticle.ArXivID == 0 ? -1 : responseArticle.ArXivID;
+                int DOI = responseArticle.DOI == 0 ? -1 : responseArticle.DOI;
+                int PMID = responseArticle.PMID == 0 ? -1 : responseArticle.PMID;
+
+                JournalArticle article = new JournalArticle(responseArticle.id, responseArticle.title,
+                    responseArticle.authors, responseArticle.@abstract, responseArticle.journal_id,
+                    volume, issue, year,pages,ArXivID,DOI, PMID, responseArticle.folder,
+                    responseArticle.filepath, responseArticle.created_at, responseArticle.updated_at, responseArticle.favorite);
+
+                articlesList.Add(article);
+
             }
+
+            func.recreateAllArticles(articlesList);
+            articlesList = func.getRootFolderArticles();
+            
+            initDataGrid();
+
+            //Console.WriteLine("All articles: "+articlesResponse);
+
         }
 
-        private void txtPMID_TextChanged(object sender, EventArgs e)
-        {
-            if (txtPMID.Focused)
+        public void CreateFolder() {
+            /*if (System.IO.File.Exists(uid))
             {
-                //MessageBox.Show("txtVolume in focus");
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text));
-                journalArticleRow.PMID = txtPMID.Text.ToString();
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
+
+                //MessageBox.Show("File exists");
             }
+            else {
+                //System.IO.Directory.CreateDirectory(uid);
+                //MessageBox.Show("File not exists");
+            }*/
+
         }
 
-        private void txtAuthors_TextChanged(object sender, EventArgs e)
-        {
-            if (txtAuthors.Focused)
+        private void selectArticle(int listIndex) {
+            txtTitle.Text = articlesList[listIndex].getTitle();
+            txtAuthors.Text = articlesList[listIndex].getAuthors();
+            txtJournal.Text = articlesList[listIndex].getJournal();
+
+            if (articlesList[listIndex].getYear() != -1)
             {
-                //MessageBox.Show("txtVolume in focus");
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text));
-                journalArticleRow.authors = txtAuthors.Text.ToString();
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
-                listView1.SelectedItems[0].SubItems[2].Text = journalArticleRow.authors;
+                txtYear.Text = articlesList[listIndex].getYear().ToString();
             }
-        }
+            else {
+                txtYear.Text = "";
+            }
 
-
-        //TODO: think on it
-        private void ArticleChangeWithoutListView(Control txt, object column) {
-            if (txt.Focused)
+            if (articlesList[listIndex].getVolume() != -1) {
+                txtVolume.Text = articlesList[listIndex].getVolume().ToString();
+            }
+            else
             {
-                MessageBox.Show("txtVolume in focus");
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text));
-                column = int.Parse(txtVolume.Text.ToString());
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
+                txtVolume.Text = "";
             }
+
+
+            if (articlesList[listIndex].getIssue() != -1)
+            {
+                txtIssue.Text = articlesList[listIndex].getIssue().ToString();
+            }
+            else
+            {
+                txtIssue.Text = "";
+            }
+
+            if (articlesList[listIndex].getPages() != -1)
+            {
+                txtPages.Text = articlesList[listIndex].getPages().ToString();
+            }
+            else
+            {
+                txtPages.Text = "";
+            }
+
+
+            if (articlesList[listIndex].getArXivID() != -1)
+            {
+                txtArXivID.Text = articlesList[listIndex].getArXivID().ToString();
+            }
+            else
+            {
+                txtArXivID.Text = "";
+            }
+
+
+            if (articlesList[listIndex].getDOI() != -1)
+            {
+                txtDOI.Text = articlesList[listIndex].getDOI().ToString();
+            }
+            else
+            {
+                txtDOI.Text = "";
+            }
+
+
+            if (articlesList[listIndex].getPMID() != -1)
+            {
+                txtPMID.Text = articlesList[listIndex].getPMID().ToString();
+            }
+            else
+            {
+                txtPMID.Text = "";
+            }
+
+
+            txtAbstract.Text = articlesList[listIndex].getAbstractField().ToString();
+            FillDetails();
+
         }
 
-        public void FillListViewFromLocalDataSet() {
-            var array = new object[mendeleyLocalDataSet.user_library.Count];
-            array = mendeleyLocalDataSet.JournalArticles.ToArray();
-            listView1.Items.Clear();
-            for (int i =0;i< mendeleyLocalDataSet.user_library.Count; i++) {
-                MendeleyLocalDataSet.JournalArticlesRow journalArticleRow = (MendeleyLocalDataSet.JournalArticlesRow)array[i];
-                //MessageBox.Show("Title " + journalArticleRow.title);
-                ListViewItem item = new ListViewItem(journalArticleRow.Id.ToString());
-                item.SubItems.Add(journalArticleRow.filepath);
-                item.SubItems.Add(journalArticleRow.authors);
-                item.SubItems.Add(journalArticleRow.title);
-                item.SubItems.Add(journalArticleRow.year.ToString());
-                item.SubItems.Add(journalArticleRow.journal);
-                item.SubItems.Add(journalArticleRow.add_date.ToString());
-
-                listView1.Items.Add(item);
-            }
-        }
-
-        private void button3_Click(object sender, EventArgs e)
+        //TODO: row selection
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
         {
             
-            //contextMenuStrip1.Show(button3, new Point(0, button3.Height));
+            DataGridViewSelectedRowCollection selectedRows = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in selectedRows) {
+                int listIndex = Convert.ToInt32(row.Tag);
+
+                selectArticle(listIndex);
+            }
         }
 
-        private void contextMenuTextToolStripMenuItem_Click(object sender, EventArgs e)
+        private void FillDetails() {
+
+            if (dataGridView1.SelectedRows[0].Cells[1].Value == null)
+            {
+                //MessageBox.Show("No attached file");
+                btnFiles.Tag = null;
+                btnFiles.Text = "Add file";
+            }
+            else {
+                //MessageBox.Show("File attached");
+                btnFiles.Text = "Open file";
+                int listIndex = Convert.ToInt32(dataGridView1.SelectedRows[0].Tag);
+                btnFiles.Tag = articlesList[listIndex].getFilepath();
+            }
+
+        }
+
+        private void txtTitle_Leave(object sender, EventArgs e)
         {
-            
-            AddManually add = new AddManually();
-            if (add.ShowDialog() == DialogResult.OK) {
-                RefreshData();
+            DataGridViewSelectedRowCollection rowColl = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in rowColl)
+            {
+                int listIndex = Convert.ToInt32(row.Tag);
+                if (!txtTitle.Text.Equals(articlesList[listIndex].getTitle()) && !String.IsNullOrEmpty(txtTitle.Text))
+                {
+                    string newText = txtTitle.Text;
+                    articlesList[listIndex].setTitle(newText);
+                    row.Cells[TitleInd].Value = newText;
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_TITLE, newText);
+                }
+                else if (String.IsNullOrEmpty(txtTitle.Text))
+                {
+                    MessageBox.Show("Поле Название должно быть заполнено");
+                    txtTitle.Text = articlesList[listIndex].getTitle();
+                }
+            }
+        }
+
+        private void txtJournal_Leave(object sender, EventArgs e)
+        {
+            DataGridViewSelectedRowCollection rowColl = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in rowColl)
+            {
+                int listIndex = Convert.ToInt32(row.Tag);
+                if (!txtJournal.Text.Equals(articlesList[listIndex].getJournal()) && !String.IsNullOrEmpty(txtJournal.Text))
+                {
+                    string newText = txtYear.Text;
+                    articlesList[listIndex].setJournal(newText);
+                    row.Cells[JournalInd].Value = newText;
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_JOURNAL_ID, newText);
+                }
+                else if (String.IsNullOrEmpty(txtJournal.Text))
+                {
+                    MessageBox.Show("Поле журнал должно быть заполнено");
+                    txtJournal.Text = articlesList[listIndex].getJournal();
+                }
+            }
+        }
+
+        private void txtYear_Leave(object sender, EventArgs e)
+        {
+            DataGridViewSelectedRowCollection rowColl = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in rowColl)
+            {
+                int listIndex = Convert.ToInt32(row.Tag);
+                if (!txtYear.Text.Equals(articlesList[listIndex].getYear()) && !String.IsNullOrEmpty(txtYear.Text))
+                {
+                    string newText = txtYear.Text;
+                    articlesList[listIndex].setYear(Convert.ToInt32(newText));
+                    row.Cells[YearInd].Value = newText;
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_YEAR, newText);
+                }
+                //Empty field
+                else {
+                    articlesList[listIndex].setYear(-1);
+                    row.Cells[YearInd].Value = "";
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_YEAR, -1);
+                }
+            }
+        }
+
+        private void txtAuthors_Leave(object sender, EventArgs e)
+        {
+            DataGridViewSelectedRowCollection rowColl = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in rowColl)
+            {
+                int listIndex = Convert.ToInt32(row.Tag);
+                if (!txtAuthors.Text.Equals(articlesList[listIndex].getAuthors()) && !String.IsNullOrEmpty(txtAuthors.Text))
+                {
+                    string newText = txtAuthors.Text;
+                    articlesList[listIndex].setAuthors(newText);
+                    row.Cells[AuthorsInd].Value = newText;
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_AUTHORS, newText);
+                }
+                else if (String.IsNullOrEmpty(txtAuthors.Text)) {
+                    MessageBox.Show("Поле авторы должно быть заполнено");
+                    txtAuthors.Text = articlesList[listIndex].getAuthors();
+                }
+            }
+        }
+
+        private void txtVolume_Leave(object sender, EventArgs e)
+        {
+
+            DataGridViewSelectedRowCollection rowColl = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in rowColl)
+            {
+                int listIndex = Convert.ToInt32(row.Tag);
+                if (!txtVolume.Text.Equals(articlesList[listIndex].getVolume()) && !String.IsNullOrEmpty(txtVolume.Text))
+                {
+                    string newText = txtVolume.Text;
+                    articlesList[listIndex].setVolume(Convert.ToInt32(newText));
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_VOLUME, newText);
+                }//Empty field
+                else
+                {
+                    articlesList[listIndex].setVolume(-1);
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_VOLUME, -1);
+                }
+            }
+        }
+
+        private void txtIssue_Leave(object sender, EventArgs e)
+        {
+
+            DataGridViewSelectedRowCollection rowColl = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in rowColl)
+            {
+                int listIndex = Convert.ToInt32(row.Tag);
+                if (!txtIssue.Text.Equals(articlesList[listIndex].getIssue()) && !String.IsNullOrEmpty(txtIssue.Text))
+                {
+                    string newText = txtIssue.Text;
+                    articlesList[listIndex].setIssue(Convert.ToInt32(newText));
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_ISSUE, newText);
+                }
+                //Empty field
+                else
+                {
+                    articlesList[listIndex].setIssue(-1);
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_ISSUE, -1);
+                }
+            }
+        }
+
+        private void txtPages_Leave(object sender, EventArgs e)
+        {
+
+            DataGridViewSelectedRowCollection rowColl = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in rowColl)
+            {
+                int listIndex = Convert.ToInt32(row.Tag);
+                if (!txtPages.Text.Equals(articlesList[listIndex].getPages()) && !String.IsNullOrEmpty(txtPages.Text))
+                {
+                    string newText = txtPages.Text;
+                    articlesList[listIndex].setPages(Convert.ToInt32(newText));
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_PAGES, newText);
+                }
+                //Empty field
+                else
+                {
+                    articlesList[listIndex].setPages(-1);
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_PAGES, -1);
+                }
+            }
+        }
+
+        private void txtAbstract_Leave(object sender, EventArgs e)
+        {
+
+            DataGridViewSelectedRowCollection rowColl = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in rowColl)
+            {
+                int listIndex = Convert.ToInt32(row.Tag);
+                if (!txtAbstract.Text.Equals(articlesList[listIndex].getAbstractField()))
+                {
+                    string newText = txtAbstract.Text;
+                    articlesList[listIndex].setAbstractField(newText);
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_ABSTRACT, newText);
+                }
+            }
+        }
+
+        private void txtArXivID_Leave(object sender, EventArgs e)
+        {
+
+            DataGridViewSelectedRowCollection rowColl = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in rowColl)
+            {
+                int listIndex = Convert.ToInt32(row.Tag);
+                if (!txtArXivID.Text.Equals(articlesList[listIndex].getArXivID()) && !String.IsNullOrEmpty(txtArXivID.Text))
+                {
+                    string newText = txtArXivID.Text;
+                    articlesList[listIndex].setArXivID(Convert.ToInt32(newText));
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_ARXIVID, newText);
+                }
+                //Empty field
+                else
+                {
+                    articlesList[listIndex].setArXivID(-1);
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_ARXIVID, -1);
+                }
+            }
+        }
+
+        private void txtDOI_Leave(object sender, EventArgs e)
+        {
+
+            DataGridViewSelectedRowCollection rowColl = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in rowColl)
+            {
+                int listIndex = Convert.ToInt32(row.Tag);
+                if (!txtDOI.Text.Equals(articlesList[listIndex].getDOI()) && !String.IsNullOrEmpty(txtDOI.Text))
+                {
+                    string newText = txtDOI.Text;
+                    articlesList[listIndex].setDOI(Convert.ToInt32(newText));
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_DOI, newText);
+                }
+                //Empty field
+                else
+                {
+                    articlesList[listIndex].setDOI(-1);
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_DOI, -1);
+                }
+            }
+        }
+
+        private void txtPMID_Leave(object sender, EventArgs e)
+        {
+
+            DataGridViewSelectedRowCollection rowColl = dataGridView1.SelectedRows;
+
+            foreach (DataGridViewRow row in rowColl)
+            {
+                int listIndex = Convert.ToInt32(row.Tag);
+                if (!txtPMID.Text.Equals(articlesList[listIndex].getPMID()) && !String.IsNullOrEmpty(txtPMID.Text))
+                {
+                    string newText = txtPMID.Text;
+                    articlesList[listIndex].setPMID(Convert.ToInt32(newText));
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_PMID, newText);
+                }
+                //Empty field
+                else
+                {
+                    articlesList[listIndex].setPMID(-1);
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_PMID, -1);
+                }
             }
         }
 
@@ -756,6 +838,19 @@ namespace Mendeley
                     string fileName = ofd.SafeFileName;
                     fileDestPath = Path.Combine(func.getWorkspacePath(), fileName);
                     File.Copy(ofd.FileName, fileDestPath, true);
+
+                    DataGridViewSelectedRowCollection selectedRows = dataGridView1.SelectedRows;
+
+                    int listIndex = -1;
+                    foreach (DataGridViewRow row in selectedRows)
+                    {
+                        listIndex = Convert.ToInt32(row.Tag);
+                        row.Cells[FileAttachedInd].Value = imageList1.Images[2];
+                    }
+
+                    articlesList[listIndex].setFilepath(fileDestPath);
+                    func.editArticle(articlesList[listIndex].getLocal_id(), Functions.KEY_ARTICLE_FILEPATH, fileDestPath);
+
                     return true;
                 }
                 else
@@ -774,17 +869,10 @@ namespace Mendeley
             if (btnFiles.Text.ToString().Equals("Add file"))
             {
                 if (addFileToMainFolder()) {
-                    if (materialtype.Text.ToString().Equals("JournalArticle"))
-                    {
-                        //mendeleyLocalDataSet.JournalArticles[8].filepath = fileDestPath;
-                        MendeleyLocalDataSet.JournalArticlesRow journalArticleRow =
-                            mendeleyLocalDataSet.JournalArticles.FindById(int.Parse(materialid.Text.ToString()));
-                        journalArticleRow.filepath = fileDestPath;
-                        journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
-                        btnFiles.Text = "Open File";
-                        RefreshData();
-                        btnFiles.Tag = fileDestPath;
-                    }
+                    //MessageBox.Show("File added");
+                    
+                    btnFiles.Text = "Open File";
+                    btnFiles.Tag = fileDestPath;
                 }
                 
             }
@@ -792,7 +880,7 @@ namespace Mendeley
             {
                 if (Path.GetExtension(btnFiles.Tag.ToString()).Equals(".pdf"))
                 {
-                    MessageBox.Show("pdf file exists");
+                    //MessageBox.Show("pdf file exists");
                     /*ReadFile read = new ReadFile();
                     read.SetFileToShow(btnFiles.Tag.ToString());
                     read.ShowDialog();*/
@@ -843,46 +931,426 @@ namespace Mendeley
             }
         }
 
-        private void addFileToolStripMenuItem_Click(object sender, EventArgs e)
+        private void txtYear_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (addFileToMainFolder()) {
-
-                MendeleyLocalDataSet.JournalArticlesRow newJournalArticleRow;
-                newJournalArticleRow = mendeleyLocalDataSet.JournalArticles.NewJournalArticlesRow();
-
-                newJournalArticleRow.Id = func.newIdForArticles(mendeleyLocalDataSet);
-                newJournalArticleRow.title = Path.GetFileNameWithoutExtension(ofd.FileName);
-                newJournalArticleRow.authors = "";
-                newJournalArticleRow.journal = "";
-                newJournalArticleRow.year = DateTime.Now.Year;
-                newJournalArticleRow.volume = 0;
-                newJournalArticleRow.issue = 0;
-                newJournalArticleRow.pages = 0;
-                newJournalArticleRow._abstract = "";
-                newJournalArticleRow.ArXivID = "";
-                newJournalArticleRow.DOI = "";
-                newJournalArticleRow.PMID = "";
-                newJournalArticleRow.filepath = fileDestPath;
-                newJournalArticleRow.add_date = DateTime.Now;
-
-                mendeleyLocalDataSet.JournalArticles.Rows.Add(newJournalArticleRow);
-                journalArticlesTableAdapter.Update(mendeleyLocalDataSet.JournalArticles);
-
-                MendeleyLocalDataSet.user_libraryRow newuser_libraryRow;
-                newuser_libraryRow = mendeleyLocalDataSet.user_library.Newuser_libraryRow();
-
-                newuser_libraryRow.id = func.newIdForLibrary(mendeleyLocalDataSet);
-                newuser_libraryRow.mid = func.newIdForArticles(mendeleyLocalDataSet);
-                newuser_libraryRow.uid = int.Parse(passUID);
-                newuser_libraryRow.type = "JournalArticle";
-                newuser_libraryRow.favorite = 0;
-
-                mendeleyLocalDataSet.user_library.Rows.Add(newuser_libraryRow);
-                user_libraryTableAdapter.Update(mendeleyLocalDataSet.user_library);
-
-                RefreshData();
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.')) {
+                e.Handled = true;
             }
+        }
+
+        private void txtVolume_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtIssue_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtPages_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtArXivID_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtDOI_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtPMID_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            TreeNode selectedNode = treeView1.SelectedNode;
+            tvFolderTitle.Text = selectedNode.Text;
+
+            articlesList = func.getArticlesInFolder(Convert.ToInt32(selectedNode.Tag));
+            initDataGrid();
             
+        }
+
+        private void treeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right) {
+
+                TreeNode clickedNode = e.Node;
+
+                treeView1.SelectedNode = e.Node;
+
+                //treeViewContextMenu.Show(treeView1, e.Location);
+
+                //MessageBox.Show("Right mouse button click: "+clickedNode.Tag);
+            }
+        }
+
+        private void addFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem mi = (sender as ToolStripMenuItem);
+            TreeView v = (TreeView)(mi.Owner as ContextMenuStrip).SourceControl;
+            TreeNode parentNode = v.SelectedNode;
+
+            int parentId = Convert.ToInt32(parentNode.Tag);
+            string newFolderTitle = Prompt.ShowDialog("Input new folder name", "Create folder","");
+            int newId = func.addLocalFolder(newFolderTitle,parentId);
+
+            Folder newFolder = new Folder(newFolderTitle, parentId);
+
+
+            TreeNode newNode = new TreeNode(newFolderTitle);
+            newNode.Tag = newId;
+
+            parentNode.Nodes.Add(newNode);
+            folderTreeIds.Add(newId, newNode);
+        }
+
+        private void renameFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem mi = (sender as ToolStripMenuItem);
+            TreeView v = (TreeView)(mi.Owner as ContextMenuStrip).SourceControl;
+            TreeNode node = v.SelectedNode;
+
+            int local_id = Convert.ToInt32(node.Tag);
+
+            string renamedFolderTitle = Prompt.ShowDialog("Rename folder", "Input folder title",node.Text);
+            func.changeFolderTitle(local_id,renamedFolderTitle);
+
+            node.Text = renamedFolderTitle;
+        }
+
+        private void deleteFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem mi = (sender as ToolStripMenuItem);
+            TreeView v = (TreeView)(mi.Owner as ContextMenuStrip).SourceControl;
+            TreeNode n = v.SelectedNode;
+            func.deleteFolder(Convert.ToInt32(n.Tag));
+            treeView1.SelectedNode.Remove();
+        }
+
+        int PW;
+        bool Hided;
+
+        private void btnHideSlide_Click(object sender, EventArgs e)
+        {
+            if (Hided) { btnHideSlide.Text = "H\nI\n\nD\nE"; }
+            else { btnHideSlide.Text = "S\nH\nO\nW"; }
+
+            timer1.Start();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (Hided)
+            {
+                slidePanel.Width = slidePanel.Width + 20;
+                if (slidePanel.Width >= PW) {
+                    timer1.Stop();
+                    Hided = false;
+                    //this.Refresh();
+                }
+            }
+            else {
+                slidePanel.Width = slidePanel.Width - 20;
+                if (slidePanel.Width <= 0) {
+                    timer1.Stop();
+                    Hided = true;
+                    //this.Refresh();
+                }
+            }
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int currentIndex = listBox1.SelectedIndex;
+
+            switch (currentIndex)
+            {
+                //Search
+                case 0:
+                    break;
+                //Search
+                case 1:
+                    break;
+                //All articles
+                case 3:
+                    articlesList = func.getAllArticles();
+                    initDataGrid();
+                    tvFolderTitle.Text = "All articles";
+                    break;
+                //All articles
+                case 4:
+                    articlesList = func.getAllArticles();
+                    initDataGrid();
+                    tvFolderTitle.Text = "All articles";
+                    break;
+                //My articles
+                case 5:
+                    break;
+                //Recently added
+                case 6:
+                    break;
+                //Favorite
+                case 7:
+                    articlesList = func.getFavoriteArticles();
+                    initDataGrid();
+                    tvFolderTitle.Text = "Favorites";
+                    break;
+            }
+        }
+
+        private void btnAddManually_Click(object sender, EventArgs e)
+        {
+            //string renamedFolderTitle = Prompt.ShowDialog("Rename folder", "Input folder title",node.Text);
+
+            AddManually add = new AddManually();
+            if (add.ShowDialog() == DialogResult.OK)
+            {
+
+                JournalArticle newArticle = add.article;
+
+                TreeNode currentNode = treeView1.SelectedNode;
+                if (currentNode == null)
+                {
+                    newArticle.setFolder(0);
+                }
+                else {
+                    newArticle.setFolder(Convert.ToInt32(currentNode.Tag));
+                }
+
+                //PHP: 2017-09-28 06:57:34
+                //JAVA: Tue Oct 24 16:41:50 GMT+07:00 2017
+                newArticle.setCreated_at(DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"));
+
+                int newArticleId = func.addLocalArticle(newArticle);
+                newArticle.setLocal_id(newArticleId);
+
+                articlesList.Add(newArticle);
+                initDataGrid();
+            }
+        }
+
+
+        private void syncFolders() {
+            string folderListStr = func.composeJSONFromFolders();
+
+            NameValueCollection formData = HttpUtility.ParseQueryString(String.Empty);
+            formData.Add("request",folderListStr);
+            formData.Add("type","windows");
+            string postData = formData.ToString();
+
+            string response = RESTful.PostRequest(EndPoints.URL_SEND_FOLDERS, postData);
+
+
+            MessageBox.Show("Folder response: "+response);
+
+            JObject obj = null;
+            obj = JObject.Parse(response);
+
+            JArray globalIdNamesArr = obj["global_ids"] as JArray;
+            JArray local_dataArr = obj["local_data"] as JArray;
+
+            //MessageBox.Show("obj: "+obj.ToString());
+
+                foreach (JObject localFolderObj in local_dataArr)
+                {
+                    int global_id = Convert.ToInt32(localFolderObj.GetValue("global_id"));
+                    int local_id = Convert.ToInt32(localFolderObj.GetValue("local_id"));
+                    int is_delete = Convert.ToInt32(localFolderObj.GetValue("is_delete"));
+
+                    func.disableIsNewFolder();
+                    func.disableIsRenameFolder();
+
+                    //TODO: Если global_id вернувшейся папки равно 0, то родитель папки был удален и эту папку
+                    //TODO: тоже нужно удалить
+                    if (global_id == 0)
+                    {
+                        func.deleteParentFolder(local_id);
+                        continue;
+                        //TODO:Если global_id вернувшейся папки равен -1, то просто удалить папки
+                    }
+                    else if (global_id == -1)
+                    {
+                        func.deleteGlobalFolder(local_id);
+                        continue;
+                    }
+
+                    //TODO: Если is_delete вернувшейся папки равно единице, то удаляем её
+                    if (is_delete == 1)
+                    {
+                        func.deleteGlobalFolder(local_id);
+                    }
+                }
+
+                //Вторая часть
+
+                foreach (JObject globalFolderData in globalIdNamesArr)
+                {
+                    func.checkCreateRenameFolder(globalFolderData);
+                }
+
+                /*for (int i = 0; i < globalIdNamesArr.length(); i++)
+                {
+
+
+
+                    JSONObject globalFolderData = globalIdNamesArr.getJSONObject(i);
+                    //int global_id = globalFolderData.getInt("id");
+
+                    Log.d(TAG, "MainActivity: checkCreateRenameFolder global_id: " + globalFolderData.getInt("id")
+                        + ", title: " + globalFolderData.getString("name"));
+
+                    dbh.checkCreateRenameFolder(globalFolderData);
+
+                    //TODO: Restart Activity when done all synchronization
+                }*/
+            /*}
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.Source.ToString(), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }*/
+
+            syncArticles();
+            //Upload(EndPoints.URL_SEND_FILE, "params",);
+        }
+
+        private void syncArticles() {
+            string articlesListStr = func.composeJSONFromArticles();
+
+            NameValueCollection formData = HttpUtility.ParseQueryString(String.Empty);
+            formData.Add("request", articlesListStr);
+            formData.Add("type","windows");
+            string postData = formData.ToString();
+
+            string response = RESTful.PostRequest(EndPoints.URL_SEND_ARTICLES,postData);
+
+            //MessageBox.Show("SyncArticles response: " + response);
+
+            JObject obj = JObject.Parse(response);
+
+            JArray serverCreatedArr = obj["serverCreated"] as JArray;
+            JArray insertedArticleArr = obj["insertedArticles"] as JArray;
+            JArray needToSyncArr = obj["needToSync"] as JArray;
+            JArray needToDeleteArr = obj["needToDelete"] as JArray;
+
+            foreach (JValue needToDeleteObj in needToDeleteArr)
+            {
+                //MessageBox.Show("NeedToDelete: "+needToDeleteObj.ToString());
+
+                func.deleteGlobalArticle(Convert.ToInt32(needToDeleteObj));
+                
+                //func.deleteGlobalArticle(Convert.ToInt32(needToDeleteObj.GetValue("global_id")));
+            }
+
+            foreach (JObject insertedArticleObj in insertedArticleArr)
+            {
+
+                int local_id = Convert.ToInt32(insertedArticleObj.GetValue("local_id"));
+                int global_id = Convert.ToInt32(insertedArticleObj.GetValue("global_id"));
+
+                func.setGlobalIdToArticle(local_id,global_id);
+            }
+
+            foreach (JObject serverCreatedObj in serverCreatedArr)
+            {
+                func.addGlobalArticle(serverCreatedObj);
+            }
+
+            foreach (var needToSyncObj in needToSyncArr) {
+
+                if(needToSyncObj.GetType() == typeof(JArray)) {
+                    foreach (JObject needToSyncFinalObj in needToSyncObj) {
+                        func.updateLocalArticleByServer(needToSyncFinalObj);
+                    }
+                }
+                
+            }
+
+
+            //Databases are synched, refresh DataGridView
+            /*
+             func.recreateAllArticles(articlesList);
+            articlesList = func.getRootFolderArticles();
+            
+            initDataGrid();
+             */
+
+            articlesList = func.getRootFolderArticles();
+            initDataGrid();
+            tvFolderTitle.Text = "All articles";
+            MessageBox.Show("Синхронизация прошла успешно");
+
+        }
+
+        private Stream Upload(string actionUrl, string paramString, Stream paramFileString, byte[] paramFilesBytes) {
+            HttpContent stringContent = new StringContent(paramString);
+            HttpContent fileStreamContent = new StreamContent(paramFileString);
+            HttpContent bytesContent = new ByteArrayContent(paramFilesBytes);
+            using (var client = new HttpClient())
+            using (var formData = new MultipartFormDataContent()) {
+                formData.Add(stringContent, "param1", "param1");
+                formData.Add(fileStreamContent, "file1","file1");
+                formData.Add(bytesContent, "file2","file2");
+                var response = client.PostAsync(actionUrl, formData).Result;
+                if (!response.IsSuccessStatusCode) {
+                    return null;
+                }
+                return response.Content.ReadAsStreamAsync().Result;
+            }
+        }
+
+        private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            //e.Button == MouseButtons.
+            if (e.Button == MouseButtons.Right) {
+
+                dataGridView1.Rows[e.RowIndex].Selected = true;
+                dataGridRowIndex = e.RowIndex;
+                dataGridView1.CurrentCell = dataGridView1.Rows[e.RowIndex].Cells[1];
+                dataGridViewContextMenu.Show(dataGridView1, e.Location);
+                dataGridViewContextMenu.Show(Cursor.Position);
+            }
+        }
+
+        private void btnSync_Click(object sender, EventArgs e)
+        {
+            syncFolders();
+        }
+
+        private void deleteArticleToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+
+            int listIndex = Convert.ToInt32(dataGridView1.Rows[dataGridRowIndex].Tag);
+            dataGridView1.Rows.RemoveAt(dataGridRowIndex);
+            func.deleteLocalArticle(articlesList[listIndex].getLocal_id());
+            articlesList.RemoveAt(listIndex);
+            //Слишком затратно(придумать по другому)
+            initDataGrid();
         }
     }
 }

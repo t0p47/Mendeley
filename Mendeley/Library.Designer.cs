@@ -29,12 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
-            "",
-            "Title"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("ListVIewItem1");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Library));
-            this.listView1 = new System.Windows.Forms.ListView();
             this.favoriteHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.fileHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.authorsHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -42,9 +37,13 @@
             this.yearHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.journalHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.addDateHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.button1 = new System.Windows.Forms.Button();
+            this.dataGridViewContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.deleteArticleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.txtTitle = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
             this.btnFiles = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
             this.txtAuthors = new System.Windows.Forms.TextBox();
@@ -72,131 +71,99 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.tvName = new System.Windows.Forms.Label();
-            this.comboBoxTypes = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.btnTest = new System.Windows.Forms.Button();
+            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.treeViewContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.addFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renameFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.slidePanel = new System.Windows.Forms.Panel();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.btnHideSlide = new System.Windows.Forms.Button();
+            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.btnAddManually = new System.Windows.Forms.Button();
+            this.tvFolderTitle = new System.Windows.Forms.Label();
             this.btnSync = new System.Windows.Forms.Button();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.contextMenuTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.button2 = new System.Windows.Forms.Button();
-            this.user_libraryDataGridView = new System.Windows.Forms.DataGridView();
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.user_libraryBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.mendeleyLocalDataSet = new Mendeley.MendeleyLocalDataSet();
-            this.btnSaveChange = new System.Windows.Forms.Button();
-            this.journalArticlesBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.journalArticlesDataGridView = new System.Windows.Forms.DataGridView();
-            this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn15 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn16 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn18 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn19 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn20 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.button3 = new System.Windows.Forms.Button();
-            this.journalArticlesTableAdapter = new Mendeley.MendeleyLocalDataSetTableAdapters.JournalArticlesTableAdapter();
-            this.tableAdapterManager = new Mendeley.MendeleyLocalDataSetTableAdapters.TableAdapterManager();
-            this.user_libraryTableAdapter = new Mendeley.MendeleyLocalDataSetTableAdapters.user_libraryTableAdapter();
+            this.dataGridViewContextMenu.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.contextMenuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.user_libraryDataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.user_libraryBindingSource)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mendeleyLocalDataSet)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.journalArticlesBindingSource)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.journalArticlesDataGridView)).BeginInit();
+            this.treeViewContextMenu.SuspendLayout();
+            this.slidePanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
-            // 
-            // listView1
-            // 
-            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.favoriteHeader,
-            this.fileHeader,
-            this.authorsHeader,
-            this.titleHeader,
-            this.yearHeader,
-            this.journalHeader,
-            this.addDateHeader});
-            this.listView1.FullRowSelect = true;
-            this.listView1.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2});
-            this.listView1.Location = new System.Drawing.Point(12, 44);
-            this.listView1.MultiSelect = false;
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(464, 97);
-            this.listView1.TabIndex = 2;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.Details;
-            this.listView1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseClick);
             // 
             // favoriteHeader
             // 
-            this.favoriteHeader.Text = "favorite";
+            this.favoriteHeader.Text = "";
+            this.favoriteHeader.Width = 50;
             // 
             // fileHeader
             // 
-            this.fileHeader.Text = "File Attached";
-            this.fileHeader.Width = 77;
+            this.fileHeader.Text = "";
+            this.fileHeader.Width = 94;
             // 
             // authorsHeader
             // 
             this.authorsHeader.Text = "Authors";
+            this.authorsHeader.Width = 53;
             // 
             // titleHeader
             // 
             this.titleHeader.Text = "Title";
+            this.titleHeader.Width = 39;
             // 
             // yearHeader
             // 
             this.yearHeader.Text = "Year";
+            this.yearHeader.Width = 41;
             // 
             // journalHeader
             // 
             this.journalHeader.Text = "Published In";
-            this.journalHeader.Width = 83;
+            this.journalHeader.Width = 105;
             // 
             // addDateHeader
             // 
             this.addDateHeader.Text = "Added";
+            this.addDateHeader.Width = 52;
             // 
-            // button1
+            // dataGridViewContextMenu
             // 
-            this.button1.Location = new System.Drawing.Point(12, 148);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(111, 23);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Get From Web DB";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.dataGridViewContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteArticleToolStripMenuItem});
+            this.dataGridViewContextMenu.Name = "listViewContextMenu";
+            this.dataGridViewContextMenu.Size = new System.Drawing.Size(143, 26);
+            // 
+            // deleteArticleToolStripMenuItem
+            // 
+            this.deleteArticleToolStripMenuItem.Name = "deleteArticleToolStripMenuItem";
+            this.deleteArticleToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.deleteArticleToolStripMenuItem.Text = "Delete article";
+            this.deleteArticleToolStripMenuItem.Click += new System.EventHandler(this.deleteArticleToolStripMenuItem_Click_1);
+            // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "icons8-star-50.png");
+            this.imageList1.Images.SetKeyName(1, "star_fill.png");
+            this.imageList1.Images.SetKeyName(2, "document.png");
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(483, 13);
+            this.tabControl1.Location = new System.Drawing.Point(3, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(305, 659);
+            this.tabControl1.Size = new System.Drawing.Size(310, 726);
             this.tabControl1.TabIndex = 1;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.txtTitle);
+            this.tabPage1.Controls.Add(this.label15);
             this.tabPage1.Controls.Add(this.btnFiles);
             this.tabPage1.Controls.Add(this.label14);
             this.tabPage1.Controls.Add(this.txtAuthors);
@@ -224,16 +191,30 @@
             this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.label3);
             this.tabPage1.Controls.Add(this.label2);
-            this.tabPage1.Controls.Add(this.tvName);
-            this.tabPage1.Controls.Add(this.comboBoxTypes);
-            this.tabPage1.Controls.Add(this.label1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(297, 633);
+            this.tabPage1.Size = new System.Drawing.Size(302, 700);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Details";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // txtTitle
+            // 
+            this.txtTitle.Location = new System.Drawing.Point(72, 41);
+            this.txtTitle.Name = "txtTitle";
+            this.txtTitle.Size = new System.Drawing.Size(216, 20);
+            this.txtTitle.TabIndex = 45;
+            this.txtTitle.Leave += new System.EventHandler(this.txtTitle_Leave);
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(15, 44);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(27, 13);
+            this.label15.TabIndex = 44;
+            this.label15.Text = "Title";
             // 
             // btnFiles
             // 
@@ -241,7 +222,7 @@
             this.btnFiles.Name = "btnFiles";
             this.btnFiles.Size = new System.Drawing.Size(75, 23);
             this.btnFiles.TabIndex = 43;
-            this.btnFiles.Text = "button4";
+            this.btnFiles.Text = "Add file";
             this.btnFiles.UseVisualStyleBackColor = true;
             this.btnFiles.Click += new System.EventHandler(this.btnFiles_Click);
             // 
@@ -250,24 +231,24 @@
             this.label14.AutoSize = true;
             this.label14.Location = new System.Drawing.Point(10, 587);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(32, 13);
+            this.label14.Size = new System.Drawing.Size(31, 13);
             this.label14.TabIndex = 42;
             this.label14.Text = "Files:";
             // 
             // txtAuthors
             // 
-            this.txtAuthors.Location = new System.Drawing.Point(78, 58);
+            this.txtAuthors.Location = new System.Drawing.Point(72, 67);
             this.txtAuthors.Name = "txtAuthors";
-            this.txtAuthors.Size = new System.Drawing.Size(216, 21);
+            this.txtAuthors.Size = new System.Drawing.Size(216, 20);
             this.txtAuthors.TabIndex = 41;
-            this.txtAuthors.TextChanged += new System.EventHandler(this.txtAuthors_TextChanged);
+            this.txtAuthors.Leave += new System.EventHandler(this.txtAuthors_Leave);
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(15, 61);
+            this.label13.Location = new System.Drawing.Point(15, 70);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(45, 13);
+            this.label13.Size = new System.Drawing.Size(43, 13);
             this.label13.TabIndex = 40;
             this.label13.Text = "Authors";
             // 
@@ -295,32 +276,35 @@
             // 
             this.txtPMID.Location = new System.Drawing.Point(72, 551);
             this.txtPMID.Name = "txtPMID";
-            this.txtPMID.Size = new System.Drawing.Size(216, 21);
+            this.txtPMID.Size = new System.Drawing.Size(216, 20);
             this.txtPMID.TabIndex = 37;
-            this.txtPMID.TextChanged += new System.EventHandler(this.txtPMID_TextChanged);
+            this.txtPMID.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPMID_KeyPress);
+            this.txtPMID.Leave += new System.EventHandler(this.txtPMID_Leave);
             // 
             // txtDOI
             // 
             this.txtDOI.Location = new System.Drawing.Point(72, 525);
             this.txtDOI.Name = "txtDOI";
-            this.txtDOI.Size = new System.Drawing.Size(216, 21);
+            this.txtDOI.Size = new System.Drawing.Size(216, 20);
             this.txtDOI.TabIndex = 36;
-            this.txtDOI.TextChanged += new System.EventHandler(this.txtDOI_TextChanged);
+            this.txtDOI.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtDOI_KeyPress);
+            this.txtDOI.Leave += new System.EventHandler(this.txtDOI_Leave);
             // 
             // txtArXivID
             // 
             this.txtArXivID.Location = new System.Drawing.Point(72, 499);
             this.txtArXivID.Name = "txtArXivID";
-            this.txtArXivID.Size = new System.Drawing.Size(216, 21);
+            this.txtArXivID.Size = new System.Drawing.Size(216, 20);
             this.txtArXivID.TabIndex = 35;
-            this.txtArXivID.TextChanged += new System.EventHandler(this.txtArXivID_TextChanged);
+            this.txtArXivID.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtArXivID_KeyPress);
+            this.txtArXivID.Leave += new System.EventHandler(this.txtArXivID_Leave);
             // 
             // label10
             // 
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(10, 554);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(36, 13);
+            this.label10.Size = new System.Drawing.Size(37, 13);
             this.label10.TabIndex = 34;
             this.label10.Text = "PMID:";
             // 
@@ -329,7 +313,7 @@
             this.label11.AutoSize = true;
             this.label11.Location = new System.Drawing.Point(10, 528);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(30, 13);
+            this.label11.Size = new System.Drawing.Size(29, 13);
             this.label11.TabIndex = 33;
             this.label11.Text = "DOI:";
             // 
@@ -338,7 +322,7 @@
             this.label12.AutoSize = true;
             this.label12.Location = new System.Drawing.Point(10, 502);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(50, 13);
+            this.label12.Size = new System.Drawing.Size(49, 13);
             this.label12.TabIndex = 32;
             this.label12.Text = "ArXiv ID:";
             // 
@@ -357,7 +341,7 @@
             this.maskedTextBox1.Location = new System.Drawing.Point(10, 419);
             this.maskedTextBox1.Mask = " ";
             this.maskedTextBox1.Name = "maskedTextBox1";
-            this.maskedTextBox1.Size = new System.Drawing.Size(278, 21);
+            this.maskedTextBox1.Size = new System.Drawing.Size(278, 20);
             this.maskedTextBox1.TabIndex = 30;
             // 
             // label8
@@ -377,7 +361,7 @@
             this.txtAbstract.Size = new System.Drawing.Size(281, 96);
             this.txtAbstract.TabIndex = 28;
             this.txtAbstract.Text = "";
-            this.txtAbstract.TextChanged += new System.EventHandler(this.txtAbstract_TextChanged);
+            this.txtAbstract.Leave += new System.EventHandler(this.txtAbstract_Leave);
             // 
             // label7
             // 
@@ -391,75 +375,79 @@
             // 
             // txtPages
             // 
-            this.txtPages.Location = new System.Drawing.Point(75, 189);
+            this.txtPages.Location = new System.Drawing.Point(72, 198);
             this.txtPages.Name = "txtPages";
-            this.txtPages.Size = new System.Drawing.Size(216, 21);
+            this.txtPages.Size = new System.Drawing.Size(216, 20);
             this.txtPages.TabIndex = 26;
-            this.txtPages.TextChanged += new System.EventHandler(this.txtPages_TextChanged);
+            this.txtPages.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPages_KeyPress);
+            this.txtPages.Leave += new System.EventHandler(this.txtPages_Leave);
             // 
             // txtIssue
             // 
-            this.txtIssue.Location = new System.Drawing.Point(75, 163);
+            this.txtIssue.Location = new System.Drawing.Point(72, 172);
             this.txtIssue.Name = "txtIssue";
-            this.txtIssue.Size = new System.Drawing.Size(216, 21);
+            this.txtIssue.Size = new System.Drawing.Size(216, 20);
             this.txtIssue.TabIndex = 25;
-            this.txtIssue.TextChanged += new System.EventHandler(this.txtIssue_TextChanged);
+            this.txtIssue.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtIssue_KeyPress);
+            this.txtIssue.Leave += new System.EventHandler(this.txtIssue_Leave);
             // 
             // txtVolume
             // 
-            this.txtVolume.Location = new System.Drawing.Point(75, 137);
+            this.txtVolume.Location = new System.Drawing.Point(72, 146);
             this.txtVolume.Name = "txtVolume";
-            this.txtVolume.Size = new System.Drawing.Size(216, 21);
+            this.txtVolume.Size = new System.Drawing.Size(216, 20);
             this.txtVolume.TabIndex = 24;
-            this.txtVolume.TextChanged += new System.EventHandler(this.txtVolume_TextChanged);
+            this.txtVolume.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtVolume_KeyPress);
+            this.txtVolume.Leave += new System.EventHandler(this.txtVolume_Leave);
             // 
             // txtYear
             // 
-            this.txtYear.Location = new System.Drawing.Point(75, 111);
+            this.txtYear.Location = new System.Drawing.Point(72, 120);
             this.txtYear.Name = "txtYear";
-            this.txtYear.Size = new System.Drawing.Size(216, 21);
+            this.txtYear.Size = new System.Drawing.Size(216, 20);
             this.txtYear.TabIndex = 23;
-            this.txtYear.TextChanged += new System.EventHandler(this.txtYear_TextChanged);
+            this.txtYear.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtYear_KeyPress);
+            this.txtYear.Leave += new System.EventHandler(this.txtYear_Leave);
             // 
             // txtJournal
             // 
-            this.txtJournal.Location = new System.Drawing.Point(75, 85);
+            this.txtJournal.Location = new System.Drawing.Point(72, 94);
             this.txtJournal.Name = "txtJournal";
-            this.txtJournal.Size = new System.Drawing.Size(216, 21);
+            this.txtJournal.Size = new System.Drawing.Size(216, 20);
             this.txtJournal.TabIndex = 22;
-            this.txtJournal.TextChanged += new System.EventHandler(this.txtJournal_TextChanged);
+            this.txtJournal.Leave += new System.EventHandler(this.txtJournal_Leave);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(13, 192);
+            this.label6.Location = new System.Drawing.Point(15, 201);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(36, 13);
+            this.label6.Size = new System.Drawing.Size(37, 13);
             this.label6.TabIndex = 21;
             this.label6.Text = "Pages";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(13, 166);
+            this.label5.Location = new System.Drawing.Point(15, 175);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(33, 13);
+            this.label5.Size = new System.Drawing.Size(32, 13);
             this.label5.TabIndex = 20;
             this.label5.Text = "Issue";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(13, 140);
+            this.label4.Location = new System.Drawing.Point(15, 149);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(41, 13);
+            this.label4.Size = new System.Drawing.Size(42, 13);
             this.label4.TabIndex = 19;
             this.label4.Text = "Volume";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 114);
+            this.label3.Location = new System.Drawing.Point(15, 123);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(29, 13);
             this.label3.TabIndex = 18;
@@ -468,369 +456,187 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(13, 88);
+            this.label2.Location = new System.Drawing.Point(15, 97);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(42, 13);
+            this.label2.Size = new System.Drawing.Size(41, 13);
             this.label2.TabIndex = 17;
             this.label2.Text = "Journal";
-            // 
-            // tvName
-            // 
-            this.tvName.AutoSize = true;
-            this.tvName.Location = new System.Drawing.Point(13, 38);
-            this.tvName.Name = "tvName";
-            this.tvName.Size = new System.Drawing.Size(93, 13);
-            this.tvName.TabIndex = 16;
-            this.tvName.Text = "Название статьи";
-            // 
-            // comboBoxTypes
-            // 
-            this.comboBoxTypes.FormattingEnabled = true;
-            this.comboBoxTypes.Items.AddRange(new object[] {
-            "JournalArticle",
-            "Book",
-            "Film"});
-            this.comboBoxTypes.Location = new System.Drawing.Point(51, 6);
-            this.comboBoxTypes.Name = "comboBoxTypes";
-            this.comboBoxTypes.Size = new System.Drawing.Size(243, 21);
-            this.comboBoxTypes.TabIndex = 15;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(31, 13);
-            this.label1.TabIndex = 14;
-            this.label1.Text = "Type";
             // 
             // tabPage2
             // 
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(297, 633);
+            this.tabPage2.Size = new System.Drawing.Size(302, 700);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Notes";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // btnTest
+            // treeView1
             // 
-            this.btnTest.Location = new System.Drawing.Point(368, 272);
-            this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(75, 23);
-            this.btnTest.TabIndex = 4;
-            this.btnTest.Text = "TEST";
-            this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Visible = false;
-            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            this.treeView1.ContextMenuStrip = this.treeViewContextMenu;
+            this.treeView1.Location = new System.Drawing.Point(12, 189);
+            this.treeView1.Name = "treeView1";
+            this.treeView1.Size = new System.Drawing.Size(141, 205);
+            this.treeView1.TabIndex = 13;
+            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
+            this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView1_NodeMouseClick);
+            // 
+            // treeViewContextMenu
+            // 
+            this.treeViewContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addFolderToolStripMenuItem,
+            this.renameFolderToolStripMenuItem,
+            this.deleteFolderToolStripMenuItem});
+            this.treeViewContextMenu.Name = "treeViewContextMenu";
+            this.treeViewContextMenu.Size = new System.Drawing.Size(152, 70);
+            // 
+            // addFolderToolStripMenuItem
+            // 
+            this.addFolderToolStripMenuItem.Name = "addFolderToolStripMenuItem";
+            this.addFolderToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.addFolderToolStripMenuItem.Text = "Add folder";
+            this.addFolderToolStripMenuItem.Click += new System.EventHandler(this.addFolderToolStripMenuItem_Click);
+            // 
+            // renameFolderToolStripMenuItem
+            // 
+            this.renameFolderToolStripMenuItem.Name = "renameFolderToolStripMenuItem";
+            this.renameFolderToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.renameFolderToolStripMenuItem.Text = "Rename folder";
+            this.renameFolderToolStripMenuItem.Click += new System.EventHandler(this.renameFolderToolStripMenuItem_Click);
+            // 
+            // deleteFolderToolStripMenuItem
+            // 
+            this.deleteFolderToolStripMenuItem.Name = "deleteFolderToolStripMenuItem";
+            this.deleteFolderToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.deleteFolderToolStripMenuItem.Text = "Delete folder";
+            this.deleteFolderToolStripMenuItem.Click += new System.EventHandler(this.deleteFolderToolStripMenuItem_Click);
+            // 
+            // slidePanel
+            // 
+            this.slidePanel.BackColor = System.Drawing.Color.White;
+            this.slidePanel.Controls.Add(this.tabControl1);
+            this.slidePanel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.slidePanel.Location = new System.Drawing.Point(650, 0);
+            this.slidePanel.Name = "slidePanel";
+            this.slidePanel.Size = new System.Drawing.Size(301, 733);
+            this.slidePanel.TabIndex = 15;
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // btnHideSlide
+            // 
+            this.btnHideSlide.Location = new System.Drawing.Point(617, 136);
+            this.btnHideSlide.Name = "btnHideSlide";
+            this.btnHideSlide.Size = new System.Drawing.Size(10, 81);
+            this.btnHideSlide.TabIndex = 0;
+            this.btnHideSlide.Text = "H\r\ni\r\nd\r\ne";
+            this.btnHideSlide.UseVisualStyleBackColor = true;
+            this.btnHideSlide.Click += new System.EventHandler(this.btnHideSlide_Click);
+            // 
+            // listBox1
+            // 
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.Items.AddRange(new object[] {
+            "Mendeley",
+            "    Literature search",
+            "",
+            "My library",
+            "    All documents",
+            "    My articles",
+            "    Recently added",
+            "    Favorite"});
+            this.listBox1.Location = new System.Drawing.Point(12, 73);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(141, 108);
+            this.listBox1.TabIndex = 16;
+            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(159, 73);
+            this.dataGridView1.MultiSelect = false;
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridView1.Size = new System.Drawing.Size(449, 321);
+            this.dataGridView1.TabIndex = 17;
+            this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
+            this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
+            this.dataGridView1.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellMouseEnter);
+            this.dataGridView1.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellMouseLeave);
+            this.dataGridView1.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dataGridView1_CellPainting);
+            this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
+            // 
+            // btnAddManually
+            // 
+            this.btnAddManually.Location = new System.Drawing.Point(13, 37);
+            this.btnAddManually.Name = "btnAddManually";
+            this.btnAddManually.Size = new System.Drawing.Size(140, 23);
+            this.btnAddManually.TabIndex = 18;
+            this.btnAddManually.Text = "Add Entry Manually";
+            this.btnAddManually.UseVisualStyleBackColor = true;
+            this.btnAddManually.Click += new System.EventHandler(this.btnAddManually_Click);
+            // 
+            // tvFolderTitle
+            // 
+            this.tvFolderTitle.AutoSize = true;
+            this.tvFolderTitle.Location = new System.Drawing.Point(159, 37);
+            this.tvFolderTitle.Name = "tvFolderTitle";
+            this.tvFolderTitle.Size = new System.Drawing.Size(35, 13);
+            this.tvFolderTitle.TabIndex = 20;
+            this.tvFolderTitle.Text = "label1";
             // 
             // btnSync
             // 
-            this.btnSync.Location = new System.Drawing.Point(13, 177);
+            this.btnSync.Location = new System.Drawing.Point(251, 13);
             this.btnSync.Name = "btnSync";
             this.btnSync.Size = new System.Drawing.Size(75, 23);
-            this.btnSync.TabIndex = 5;
-            this.btnSync.Text = "Synchronize";
+            this.btnSync.TabIndex = 21;
+            this.btnSync.Text = "Sync";
             this.btnSync.UseVisualStyleBackColor = true;
-            this.btnSync.Visible = false;
             this.btnSync.Click += new System.EventHandler(this.btnSync_Click);
-            // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.contextMenuTextToolStripMenuItem,
-            this.addFileToolStripMenuItem});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(136, 48);
-            // 
-            // contextMenuTextToolStripMenuItem
-            // 
-            this.contextMenuTextToolStripMenuItem.Name = "contextMenuTextToolStripMenuItem";
-            this.contextMenuTextToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
-            this.contextMenuTextToolStripMenuItem.Text = "AddManually";
-            this.contextMenuTextToolStripMenuItem.Click += new System.EventHandler(this.contextMenuTextToolStripMenuItem_Click);
-            // 
-            // addFileToolStripMenuItem
-            // 
-            this.addFileToolStripMenuItem.Name = "addFileToolStripMenuItem";
-            this.addFileToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
-            this.addFileToolStripMenuItem.Text = "AddFile";
-            this.addFileToolStripMenuItem.Click += new System.EventHandler(this.addFileToolStripMenuItem_Click);
-            // 
-            // button2
-            // 
-            this.button2.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.button2.Location = new System.Drawing.Point(12, 177);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(111, 26);
-            this.button2.TabIndex = 6;
-            this.button2.Text = "Add article";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // user_libraryDataGridView
-            // 
-            this.user_libraryDataGridView.AutoGenerateColumns = false;
-            this.user_libraryDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.user_libraryDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn1,
-            this.dataGridViewTextBoxColumn2,
-            this.dataGridViewTextBoxColumn3,
-            this.dataGridViewTextBoxColumn4});
-            this.user_libraryDataGridView.DataSource = this.user_libraryBindingSource;
-            this.user_libraryDataGridView.Location = new System.Drawing.Point(27, 246);
-            this.user_libraryDataGridView.Name = "user_libraryDataGridView";
-            this.user_libraryDataGridView.RowTemplate.Height = 23;
-            this.user_libraryDataGridView.Size = new System.Drawing.Size(300, 220);
-            this.user_libraryDataGridView.TabIndex = 7;
-            this.user_libraryDataGridView.Visible = false;
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.DataPropertyName = "uid";
-            this.dataGridViewTextBoxColumn1.HeaderText = "uid";
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            // 
-            // dataGridViewTextBoxColumn2
-            // 
-            this.dataGridViewTextBoxColumn2.DataPropertyName = "type";
-            this.dataGridViewTextBoxColumn2.HeaderText = "type";
-            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-            // 
-            // dataGridViewTextBoxColumn3
-            // 
-            this.dataGridViewTextBoxColumn3.DataPropertyName = "mid";
-            this.dataGridViewTextBoxColumn3.HeaderText = "mid";
-            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-            // 
-            // dataGridViewTextBoxColumn4
-            // 
-            this.dataGridViewTextBoxColumn4.DataPropertyName = "favorite";
-            this.dataGridViewTextBoxColumn4.HeaderText = "favorite";
-            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
-            // 
-            // user_libraryBindingSource
-            // 
-            this.user_libraryBindingSource.DataMember = "user_library";
-            this.user_libraryBindingSource.DataSource = this.mendeleyLocalDataSet;
-            // 
-            // mendeleyLocalDataSet
-            // 
-            this.mendeleyLocalDataSet.DataSetName = "MendeleyLocalDataSet";
-            this.mendeleyLocalDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
-            // 
-            // btnSaveChange
-            // 
-            this.btnSaveChange.Location = new System.Drawing.Point(109, 142);
-            this.btnSaveChange.Name = "btnSaveChange";
-            this.btnSaveChange.Size = new System.Drawing.Size(75, 23);
-            this.btnSaveChange.TabIndex = 8;
-            this.btnSaveChange.Text = "SaeLocalDBChanges";
-            this.btnSaveChange.UseVisualStyleBackColor = true;
-            this.btnSaveChange.Visible = false;
-            this.btnSaveChange.Click += new System.EventHandler(this.btnSaveChange_Click);
-            // 
-            // journalArticlesBindingSource
-            // 
-            this.journalArticlesBindingSource.DataMember = "JournalArticles";
-            this.journalArticlesBindingSource.DataSource = this.mendeleyLocalDataSet;
-            // 
-            // journalArticlesDataGridView
-            // 
-            this.journalArticlesDataGridView.AutoGenerateColumns = false;
-            this.journalArticlesDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.journalArticlesDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn5,
-            this.dataGridViewTextBoxColumn6,
-            this.dataGridViewTextBoxColumn7,
-            this.dataGridViewTextBoxColumn8,
-            this.dataGridViewTextBoxColumn9,
-            this.dataGridViewTextBoxColumn10,
-            this.dataGridViewTextBoxColumn11,
-            this.dataGridViewTextBoxColumn12,
-            this.dataGridViewTextBoxColumn13,
-            this.dataGridViewTextBoxColumn14,
-            this.dataGridViewTextBoxColumn15,
-            this.dataGridViewTextBoxColumn16,
-            this.dataGridViewTextBoxColumn18,
-            this.dataGridViewTextBoxColumn19,
-            this.dataGridViewTextBoxColumn20});
-            this.journalArticlesDataGridView.DataSource = this.journalArticlesBindingSource;
-            this.journalArticlesDataGridView.Location = new System.Drawing.Point(27, 475);
-            this.journalArticlesDataGridView.Name = "journalArticlesDataGridView";
-            this.journalArticlesDataGridView.RowTemplate.Height = 23;
-            this.journalArticlesDataGridView.Size = new System.Drawing.Size(300, 220);
-            this.journalArticlesDataGridView.TabIndex = 10;
-            this.journalArticlesDataGridView.Visible = false;
-            // 
-            // dataGridViewTextBoxColumn5
-            // 
-            this.dataGridViewTextBoxColumn5.DataPropertyName = "Id";
-            this.dataGridViewTextBoxColumn5.HeaderText = "Id";
-            this.dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
-            // 
-            // dataGridViewTextBoxColumn6
-            // 
-            this.dataGridViewTextBoxColumn6.DataPropertyName = "title";
-            this.dataGridViewTextBoxColumn6.HeaderText = "title";
-            this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
-            // 
-            // dataGridViewTextBoxColumn7
-            // 
-            this.dataGridViewTextBoxColumn7.DataPropertyName = "authors";
-            this.dataGridViewTextBoxColumn7.HeaderText = "authors";
-            this.dataGridViewTextBoxColumn7.Name = "dataGridViewTextBoxColumn7";
-            // 
-            // dataGridViewTextBoxColumn8
-            // 
-            this.dataGridViewTextBoxColumn8.DataPropertyName = "abstract";
-            this.dataGridViewTextBoxColumn8.HeaderText = "abstract";
-            this.dataGridViewTextBoxColumn8.Name = "dataGridViewTextBoxColumn8";
-            // 
-            // dataGridViewTextBoxColumn9
-            // 
-            this.dataGridViewTextBoxColumn9.DataPropertyName = "journal";
-            this.dataGridViewTextBoxColumn9.HeaderText = "journal";
-            this.dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
-            // 
-            // dataGridViewTextBoxColumn10
-            // 
-            this.dataGridViewTextBoxColumn10.DataPropertyName = "year";
-            this.dataGridViewTextBoxColumn10.HeaderText = "year";
-            this.dataGridViewTextBoxColumn10.Name = "dataGridViewTextBoxColumn10";
-            // 
-            // dataGridViewTextBoxColumn11
-            // 
-            this.dataGridViewTextBoxColumn11.DataPropertyName = "volume";
-            this.dataGridViewTextBoxColumn11.HeaderText = "volume";
-            this.dataGridViewTextBoxColumn11.Name = "dataGridViewTextBoxColumn11";
-            // 
-            // dataGridViewTextBoxColumn12
-            // 
-            this.dataGridViewTextBoxColumn12.DataPropertyName = "issue";
-            this.dataGridViewTextBoxColumn12.HeaderText = "issue";
-            this.dataGridViewTextBoxColumn12.Name = "dataGridViewTextBoxColumn12";
-            // 
-            // dataGridViewTextBoxColumn13
-            // 
-            this.dataGridViewTextBoxColumn13.DataPropertyName = "pages";
-            this.dataGridViewTextBoxColumn13.HeaderText = "pages";
-            this.dataGridViewTextBoxColumn13.Name = "dataGridViewTextBoxColumn13";
-            // 
-            // dataGridViewTextBoxColumn14
-            // 
-            this.dataGridViewTextBoxColumn14.DataPropertyName = "ArXivID";
-            this.dataGridViewTextBoxColumn14.HeaderText = "ArXivID";
-            this.dataGridViewTextBoxColumn14.Name = "dataGridViewTextBoxColumn14";
-            // 
-            // dataGridViewTextBoxColumn15
-            // 
-            this.dataGridViewTextBoxColumn15.DataPropertyName = "DOI";
-            this.dataGridViewTextBoxColumn15.HeaderText = "DOI";
-            this.dataGridViewTextBoxColumn15.Name = "dataGridViewTextBoxColumn15";
-            // 
-            // dataGridViewTextBoxColumn16
-            // 
-            this.dataGridViewTextBoxColumn16.DataPropertyName = "PMID";
-            this.dataGridViewTextBoxColumn16.HeaderText = "PMID";
-            this.dataGridViewTextBoxColumn16.Name = "dataGridViewTextBoxColumn16";
-            // 
-            // dataGridViewTextBoxColumn18
-            // 
-            this.dataGridViewTextBoxColumn18.DataPropertyName = "add_date";
-            this.dataGridViewTextBoxColumn18.HeaderText = "add_date";
-            this.dataGridViewTextBoxColumn18.Name = "dataGridViewTextBoxColumn18";
-            // 
-            // dataGridViewTextBoxColumn19
-            // 
-            this.dataGridViewTextBoxColumn19.DataPropertyName = "update_date";
-            this.dataGridViewTextBoxColumn19.HeaderText = "update_date";
-            this.dataGridViewTextBoxColumn19.Name = "dataGridViewTextBoxColumn19";
-            // 
-            // dataGridViewTextBoxColumn20
-            // 
-            this.dataGridViewTextBoxColumn20.DataPropertyName = "delete_date";
-            this.dataGridViewTextBoxColumn20.HeaderText = "delete_date";
-            this.dataGridViewTextBoxColumn20.Name = "dataGridViewTextBoxColumn20";
-            // 
-            // contextMenuStrip2
-            // 
-            this.contextMenuStrip2.Name = "contextMenuStrip2";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(61, 4);
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(108, 176);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 12;
-            this.button3.Text = "button3";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Visible = false;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
-            // 
-            // journalArticlesTableAdapter
-            // 
-            this.journalArticlesTableAdapter.ClearBeforeFill = true;
-            // 
-            // tableAdapterManager
-            // 
-            this.tableAdapterManager.BackupDataSetBeforeUpdate = false;
-            this.tableAdapterManager.JournalArticlesTableAdapter = this.journalArticlesTableAdapter;
-            this.tableAdapterManager.UpdateOrder = Mendeley.MendeleyLocalDataSetTableAdapters.TableAdapterManager.UpdateOrderOption.InsertUpdateDelete;
-            this.tableAdapterManager.user_libraryTableAdapter = this.user_libraryTableAdapter;
-            // 
-            // user_libraryTableAdapter
-            // 
-            this.user_libraryTableAdapter.ClearBeforeFill = true;
             // 
             // Library
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.AutoScroll = true;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(825, 715);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.journalArticlesDataGridView);
-            this.Controls.Add(this.btnSaveChange);
-            this.Controls.Add(this.user_libraryDataGridView);
-            this.Controls.Add(this.button2);
+            this.ClientSize = new System.Drawing.Size(951, 733);
             this.Controls.Add(this.btnSync);
-            this.Controls.Add(this.btnTest);
-            this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.listView1);
+            this.Controls.Add(this.tvFolderTitle);
+            this.Controls.Add(this.btnAddManually);
+            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.btnHideSlide);
+            this.Controls.Add(this.slidePanel);
+            this.Controls.Add(this.treeView1);
             this.Name = "Library";
             this.Text = "My Library";
             this.Load += new System.EventHandler(this.Library_Load);
+            this.dataGridViewContextMenu.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
-            this.contextMenuStrip1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.user_libraryDataGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.user_libraryBindingSource)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mendeleyLocalDataSet)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.journalArticlesBindingSource)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.journalArticlesDataGridView)).EndInit();
+            this.treeViewContextMenu.ResumeLayout(false);
+            this.slidePanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.ListView listView1;
-        private System.Windows.Forms.ColumnHeader favoriteHeader;
-        private System.Windows.Forms.ColumnHeader fileHeader;
         private System.Windows.Forms.ColumnHeader authorsHeader;
         private System.Windows.Forms.ColumnHeader titleHeader;
         private System.Windows.Forms.ColumnHeader yearHeader;
         private System.Windows.Forms.ColumnHeader journalHeader;
         private System.Windows.Forms.ColumnHeader addDateHeader;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.TextBox txtPages;
         private System.Windows.Forms.TextBox txtIssue;
         private System.Windows.Forms.TextBox txtVolume;
@@ -841,9 +647,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label tvName;
-        private System.Windows.Forms.ComboBox comboBoxTypes;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.MaskedTextBox maskedTextBox1;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.RichTextBox txtAbstract;
@@ -855,21 +658,10 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Button btnSync;
-        private MendeleyLocalDataSet mendeleyLocalDataSet;
-        private System.Windows.Forms.BindingSource journalArticlesBindingSource;
-        private System.Windows.Forms.BindingSource user_libraryBindingSource;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem contextMenuTextToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem addFileToolStripMenuItem;
-        private System.Windows.Forms.DataGridView user_libraryDataGridView;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
-        private System.Windows.Forms.Button btnSaveChange;
-        private System.Windows.Forms.DataGridView journalArticlesDataGridView;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
@@ -890,12 +682,27 @@
         private System.Windows.Forms.Label materialid;
         private System.Windows.Forms.TextBox txtAuthors;
         private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
-        private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button btnFiles;
         private System.Windows.Forms.Label label14;
-        private MendeleyLocalDataSetTableAdapters.JournalArticlesTableAdapter journalArticlesTableAdapter;
-        private MendeleyLocalDataSetTableAdapters.TableAdapterManager tableAdapterManager;
-        private MendeleyLocalDataSetTableAdapters.user_libraryTableAdapter user_libraryTableAdapter;
+        private System.Windows.Forms.TreeView treeView1;
+        public System.Windows.Forms.ColumnHeader favoriteHeader;
+        public System.Windows.Forms.ColumnHeader fileHeader;
+        private System.Windows.Forms.TextBox txtTitle;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Button btnHideSlide;
+        private System.Windows.Forms.Panel slidePanel;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ContextMenuStrip dataGridViewContextMenu;
+        private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.ContextMenuStrip treeViewContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem addFolderToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem renameFolderToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteFolderToolStripMenuItem;
+        private System.Windows.Forms.Button btnAddManually;
+        private System.Windows.Forms.Label tvFolderTitle;
+        private System.Windows.Forms.ToolStripMenuItem deleteArticleToolStripMenuItem;
+        private System.Windows.Forms.Button btnSync;
     }
 }

@@ -10,12 +10,16 @@ using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using System.Net;
 using System.Collections.Specialized;
+using Mono.Web;
+using System.Data.SqlClient;
 
 namespace Mendeley
 {
     public partial class Login : Form
     {
         private string uid;
+        Functions func;
+        SqlConnection sqlConnection;
 
         public Login()
         {
@@ -25,114 +29,110 @@ namespace Mendeley
         private void btnSign_Click(object sender, EventArgs e)
         {
 
-            IEnumerable<KeyValuePair<string, string>> postData = new List<KeyValuePair<string, string>>() {
-                new KeyValuePair<string, string>("email",EmailText.Text.ToString()),
-                new KeyValuePair<string, string>("password",PasswordText.Text.ToString())
-            };
-            RESTful.PostRequest("http://45.76.186.7/api/authenticate", postData);
-            //MessageBox.Show(RESTful.PostRequest("http://localhost/mendeley/v1/user/login", postData).Result);
+            NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(String.Empty);
+            outgoingQueryString.Add("email", EmailText.Text.ToString());
+            outgoingQueryString.Add("password", PasswordText.Text.ToString());
+            string postData = outgoingQueryString.ToString();
 
 
-            /*if (EmailText.Text.ToString().Equals("offline")) {
-                Library main = new Library();
-                main.passUID = "1";
-                main.ShowDialog();
-                this.Hide();
-            }
-            authen();*/
-            /*if (CheckUser(EmailText.Text, PasswordText.Text))
-            {
-                Library main = new Library();
-                main.passUID = uid;
-                main.ShowDialog();
-                this.Hide();
-            }
-            else {
-                MessageBox.Show("Вы ввели неверный логи или пароль");
-            }*/
-
-        }
-
-        bool CheckUser(string email, string password) {
-
-            MySqlConnectionStringBuilder mysqlSB = new MySqlConnectionStringBuilder();
-
-            mysqlSB.Server = "141.8.194.25";
-
-            mysqlSB.Database = "a0021435_mendeley";
-
-            mysqlSB.UserID = "a0021435_user";
-
-            mysqlSB.Password = "351942025500ghj";
-
-            email = "\'" + email + "\'";
-
-            string queryString = "SELECT password, uid FROM users WHERE email="+email;
-
-            using (MySqlConnection con = new MySqlConnection()) {
-                con.ConnectionString = mysqlSB.ConnectionString;
-
-                MySqlCommand com = new MySqlCommand(queryString, con);
-
-                try {
-                    con.Open();
-
-                    using (MySqlDataReader dr = com.ExecuteReader()) {
-                        if (dr.HasRows) {
-                            if (dr.Read()) {
-                                if (dr.GetString("password") == password) {
-                                    uid = dr.GetString("uid");
-                                    MessageBox.Show(uid);
-                                    return true;
-                                }
-                            }
-                            
-                            
-                        }
-                    }
+            if (func.getTokenCount()==0) {
+                //MessageBox.Show("Login first time");
+                if (func.loginFirstTime(postData)) {
+                    Library main = new Library();
+                    main.haveInternet = true;
+                    main.ShowDialog();
+                    main.TopMost = true;
+                    this.Close();
                 }
-                catch (Exception ex) {
-                    MessageBox.Show("Exception: "+ex.Message);
-                }
+
             }
-            PasswordText.Clear();
-            return false;
-        }
-
-        private void authen() {
-            //MessageBox.Show(EmailText.Text);
-            string URL = "http://a0021435.xsph.ru/Mendeley/visual/login.php";
-            WebClient webClient = new WebClient();
-            webClient.Proxy.Credentials = CredentialCache.DefaultCredentials;
-
-            NameValueCollection formData = new NameValueCollection();
-            formData["email"] = EmailText.Text.ToString();
-            formData["pass"] = PasswordText.Text.ToString();
-
-            byte[] responseBytes = webClient.UploadValues(URL, "POST", formData);
-            string responsefromserver = Encoding.UTF8.GetString(responseBytes);
-            if (!responsefromserver.Equals("no"))
+            if (func.login(postData))
             {
-                //MessageBox.Show("UID " + responsefromserver);
+                //MessageBox.Show("Login second and other time");
                 Library main = new Library();
-                main.passUID = responsefromserver;
+                main.haveInternet = true;
                 main.ShowDialog();
-                this.Hide();
+                main.TopMost = true;
+                this.Close();
             }
-            else {
-                MessageBox.Show("Вы ввели неверный логин или пароль.");
+
+            else
+            {
+                MessageBox.Show("Something went wrong!");
             }
+
         }
 
         private void btnRegister_Click(object sender, EventArgs e)
         {
             //Online
-            //System.Diagnostics.Process.Start("http://www.testingweb.ru/Mendeley/");
+            System.Diagnostics.Process.Start(EndPoints.URL_REGISTER);
            /* System.Diagnostics.Process.Start("http://localhost/Mendeley");
             IEnumerable<KeyValuePair<string, string>> postData = new List<KeyValuePair<string, string>>() {
                 new KeyValuePair<string, string>(),
             };
             RESTful.PostRequest*/
+        }
+
+        private void Login_Load(object sender, EventArgs e)
+        {
+
+            string connectionStringDynamic = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename="+ Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\ScienceLib\ScienceLib.mdf;Integrated Security=True;MultipleActiveResultSets=True";
+
+            string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Z\Programming\VisualC#\Mendeley\Mendeley\Mendeley.mdf;Integrated Security=True;MultipleActiveResultSets=True";
+
+            string tmpConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\01Laptop\Desktop\ScienceLib.mdf;Integrated Security=True;MultipleActiveResultSets=True";
+
+            //sqlConnection = new SqlConnection(tmpConnectionString);
+
+            sqlConnection = new SqlConnection(connectionStringDynamic);
+
+            sqlConnection.Open();
+
+            Functions.sqlConnection = sqlConnection;
+
+            func = new Functions();
+
+            if (func.checkInternetConnection())
+            {
+
+                //MessageBox.Show(Convert.ToString(func.getTokenCount()));
+                //MessageBox.Show("First run "+Properties.Settings.Default.FirstRun);
+                //MessageBox.Show("We have internet connection");
+                if (func.getTokenCount()!=0)
+                {
+                    if (func.isLogin() && !func.checkTokenIsExpired())
+                    {
+                        //MessageBox.Show("We already loggedIn");
+                        Library main = new Library();
+                        main.haveInternet = true;
+                        main.ShowDialog();
+                        main.TopMost = true;
+                        this.Close();
+                    }
+                    else
+                    {
+                        //MessageBox.Show("Need to login.");
+                    }
+                }
+                else {
+                    Properties.Settings.Default.Workspace = null;
+                    //MessageBox.Show("Need to login first run");
+                }
+                
+            }
+            else {
+                MessageBox.Show("We don't internet connection");
+                /*Library main = new Library();
+                main.haveInternet = false;
+                main.ShowDialog();
+                main.TopMost = true;
+                this.Close();*/
+            }
+
+
+
+
         }
     }
 }

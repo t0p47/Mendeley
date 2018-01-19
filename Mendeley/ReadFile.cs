@@ -12,13 +12,9 @@ namespace Mendeley
 {
     public partial class ReadFile : Form
     {
-        /*public ReadFile()
-        {
-            InitializeComponent();
-        }
 
         public void SetFileToShow(String filePath) {
-            axAcroPDF1.src = filePath;
-        }*/
+            
+        }
     }
 }
